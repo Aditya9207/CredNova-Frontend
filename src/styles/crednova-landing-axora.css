@@ -1,0 +1,834 @@
+/* CredNova marketing landing — axora-inspired layout, scoped to .cn-axora */
+.cn-axora,
+.cn-axora * {
+  box-sizing: border-box;
+}
+
+.cn-axora {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #fff;
+  color: #0a0a0a;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.cn-axora nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.cn-axora .nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 40px;
+}
+.cn-axora .nav-logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #0a0a0a;
+}
+
+.cn-axora .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex: 1;
+}
+.cn-axora .nav-links button {
+  font-size: 14px;
+  font-weight: 400;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  transition: color 0.15s;
+}
+.cn-axora .nav-links button:hover {
+  color: #0a0a0a;
+}
+
+.cn-axora .nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+}
+.cn-axora .nav-actions button {
+  font-size: 14px;
+  font-weight: 400;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.cn-axora .nav-actions button:hover {
+  color: #0a0a0a;
+}
+.cn-axora .btn-signup {
+  font-weight: 500;
+  color: #0a0a0a;
+}
+
+/* Hero */
+.cn-axora .hero {
+  position: relative;
+  min-height: 100vh;
+  background: #f5f5f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding-top: 64px;
+}
+
+.cn-axora .hero-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #f5f5f7 0%, #ebebed 100%);
+}
+
+.cn-axora .card-float {
+  position: absolute;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+.cn-axora .card-float-left {
+  width: 310px;
+  height: 190px;
+  bottom: 18%;
+  left: 4%;
+  background: linear-gradient(135deg, #a8e6c8 0%, #b8d8f0 30%, #e8b4d8 60%, #f0c8a0 100%);
+  transform: rotate(-12deg);
+  animation: cnFloatLeft 6s ease-in-out infinite;
+}
+.cn-axora .card-float-right {
+  width: 260px;
+  height: 160px;
+  top: 14%;
+  right: 5%;
+  background: linear-gradient(135deg, #c4b8f0 0%, #e8b4d0 50%, #f0c4b8 100%);
+  transform: rotate(10deg);
+  animation: cnFloatRight 7s ease-in-out infinite 1s;
+}
+
+.cn-axora .card-visa {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.85);
+}
+.cn-axora .card-number {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: 0.01em;
+}
+.cn-axora .card-number .rupee {
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 2px;
+}
+.cn-axora .card-number .cents {
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.75;
+}
+.cn-axora .card-last4 {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@keyframes cnFloatLeft {
+  0%,
+  100% {
+    transform: rotate(-12deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-10deg) translateY(-12px);
+  }
+}
+@keyframes cnFloatRight {
+  0%,
+  100% {
+    transform: rotate(10deg) translateY(0);
+  }
+  50% {
+    transform: rotate(8deg) translateY(-10px);
+  }
+}
+
+.cn-axora .hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px;
+}
+.cn-axora .hero-h1 {
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: #0a0a0a;
+  margin-bottom: 0;
+}
+.cn-axora .hero-h1 .accent {
+  background: linear-gradient(90deg, #c47ab8 0%, #7b6fce 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cn-axora .hero-sub-row {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.cn-axora .hero-sub-text {
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+}
+.cn-axora .store-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cn-axora .store-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  color: #0a0a0a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+  font-family: inherit;
+}
+.cn-axora .store-btn:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+.cn-axora .store-btn-text .line1 {
+  display: block;
+  font-size: 9px;
+  color: #888;
+  letter-spacing: 0.04em;
+}
+.cn-axora .store-btn-text .line2 {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0a0a0a;
+}
+
+/* Stats */
+.cn-axora .section-stats {
+  background: #fff;
+  padding: 80px 48px;
+}
+.cn-axora .stats-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.cn-axora .stats-header {
+  margin-bottom: 64px;
+}
+.cn-axora .stats-header h2 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #0a0a0a;
+  max-width: 520px;
+  margin-bottom: 16px;
+}
+.cn-axora .stats-header p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+  max-width: 480px;
+}
+.cn-axora .stats-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.cn-axora .stat-card {
+  border-radius: 20px;
+  padding: 28px 28px 24px;
+  position: relative;
+  overflow: hidden;
+  min-height: 160px;
+}
+.cn-axora .stat-card-1 {
+  background: #eef0f5;
+}
+.cn-axora .stat-card-2 {
+  background: #edeef8;
+}
+.cn-axora .stat-card-3 {
+  background: #f5eeef;
+}
+.cn-axora .stat-blob {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.7;
+}
+.cn-axora .stat-card-1 .stat-blob {
+  background: radial-gradient(circle, #c8cce8, transparent);
+}
+.cn-axora .stat-card-2 .stat-blob {
+  background: radial-gradient(circle, #b8b4e8, #d4b8e4, transparent);
+}
+.cn-axora .stat-card-3 .stat-blob {
+  background: radial-gradient(circle, #e8c4cc, transparent);
+}
+.cn-axora .stat-value {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  letter-spacing: -0.03em;
+  position: relative;
+  z-index: 1;
+  margin-top: 40px;
+}
+.cn-axora .stat-label {
+  font-size: 13px;
+  color: #888;
+  margin-top: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Quote */
+.cn-axora .section-quote {
+  padding: 100px 48px;
+  background: #fff;
+}
+.cn-axora .quote-text {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: clamp(1.75rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  text-align: center;
+  background: linear-gradient(90deg, #c47ab8 0%, #7b6fce 60%, #5b87b7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Features */
+.cn-axora .section-feature {
+  padding: 0 48px 24px;
+}
+.cn-axora .feature-card-wrap {
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  background: #f0f1f5;
+  border-radius: 28px;
+  padding: 60px 64px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  min-height: 480px;
+  position: relative;
+  overflow: hidden;
+}
+.cn-axora .feature-card-wrap.lavender {
+  background: #eeedf8;
+}
+.cn-axora .feature-card-wrap.pink {
+  background: #f5eef0;
+}
+.cn-axora .feature-left h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #0a0a0a;
+  margin-bottom: 20px;
+}
+.cn-axora .feature-left p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.65;
+  max-width: 400px;
+  margin-bottom: 32px;
+}
+.cn-axora .btn-learn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0a0a0a;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s, transform 0.2s;
+  font-family: inherit;
+}
+.cn-axora .btn-learn:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Phone mock */
+.cn-axora .phone-mock {
+  background: #fff;
+  border-radius: 32px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  width: 280px;
+  margin-left: auto;
+}
+.cn-axora .phone-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cn-axora .phone-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5px;
+  cursor: default;
+}
+.cn-axora .phone-menu span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #333;
+  border-radius: 2px;
+  margin-bottom: 3.5px;
+}
+.cn-axora .phone-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5b87b7, #4cafb0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+}
+.cn-axora .phone-bal-label {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.cn-axora .phone-bal-value {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  color: #0a0a0a;
+  margin-bottom: 20px;
+  letter-spacing: -0.03em;
+}
+.cn-axora .phone-bal-value .rupee {
+  font-size: 1rem;
+  font-weight: 600;
+  vertical-align: super;
+}
+.cn-axora .phone-cards-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.cn-axora .phone-card-visual {
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(135deg, #e8c0cc 0%, #c8b8e8 50%, #b8c8e8 100%);
+  margin-bottom: 14px;
+  position: relative;
+  height: 110px;
+}
+.cn-axora .phone-card-amount {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+.cn-axora .phone-card-num {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.cn-axora .phone-activity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid #f0f0f0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Category rows (was stock) */
+.cn-axora .stock-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-left: auto;
+  width: 100%;
+  max-width: 300px;
+}
+.cn-axora .stock-group {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+.cn-axora .stock-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+.cn-axora .stock-row:last-child {
+  border-bottom: none;
+}
+.cn-axora .stock-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.cn-axora .stock-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0a0a0a;
+}
+.cn-axora .stock-sub {
+  font-size: 11px;
+  color: #aaa;
+}
+.cn-axora .stock-price {
+  text-align: right;
+}
+.cn-axora .stock-price-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0a0a0a;
+}
+.cn-axora .stock-apy {
+  font-size: 11px;
+  color: #888;
+}
+
+/* Goals */
+.cn-axora .goal-wrap {
+  position: relative;
+  width: 320px;
+  height: 240px;
+  margin-left: auto;
+}
+.cn-axora .goal-card {
+  position: absolute;
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cn-axora .goal-card-1 {
+  top: 0;
+  right: 0;
+  z-index: 3;
+}
+.cn-axora .goal-card-2 {
+  top: 60px;
+  right: 20px;
+  z-index: 2;
+}
+.cn-axora .goal-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.cn-axora .goal-name {
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+}
+.cn-axora .goal-amount-val {
+  font-size: 13px;
+  font-weight: 600;
+}
+.cn-axora .goal-amount-pct {
+  font-size: 11px;
+  color: #aaa;
+  text-align: right;
+}
+.cn-axora .goal-bg-card {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  width: 260px;
+  height: 110px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #e8b4c8 0%, #c4b8e8 100%);
+  z-index: 1;
+}
+.cn-axora .goal-bg-val {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Chat */
+.cn-axora .section-support {
+  padding: 100px 48px;
+  text-align: center;
+  background: #fff;
+}
+.cn-axora .section-support h2 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: #0a0a0a;
+  margin-bottom: 12px;
+}
+.cn-axora .section-support > p {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 56px;
+}
+.cn-axora .chat-wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8b4c4 0%, #c4b8e4 50%, #b8c4e4 100%);
+  padding: 32px;
+}
+.cn-axora .chat-bubble {
+  background: #fff;
+  border-radius: 4px 18px 18px 18px;
+  padding: 14px 18px;
+  max-width: 320px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+.cn-axora .chat-name {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cn-axora .chat-msg {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+.cn-axora .chat-bubble-outer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.cn-axora .chat-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7b6fce, #5b87b7);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+}
+.cn-axora .chat-typing-bubble {
+  background: #fff;
+  border-radius: 18px 18px 4px 18px;
+  padding: 14px 22px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-left: auto;
+}
+.cn-axora .typing-dots {
+  display: flex;
+  gap: 4px;
+}
+.cn-axora .typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #bbb;
+  animation: cnTyping 1.2s ease-in-out infinite;
+}
+.cn-axora .typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.cn-axora .typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes cnTyping {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* Footer */
+.cn-axora footer {
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.cn-axora .footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.cn-axora .footer-copy {
+  font-size: 13px;
+  color: #ccc;
+}
+
+/* Reveal */
+.cn-axora .cn-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.cn-axora .cn-reveal.cn-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cn-axora .cn-delay-1 {
+  transition-delay: 0.1s;
+}
+.cn-axora .cn-delay-2 {
+  transition-delay: 0.2s;
+}
+.cn-axora .cn-delay-3 {
+  transition-delay: 0.3s;
+}
+
+@media (max-width: 768px) {
+  .cn-axora nav {
+    padding: 0 20px;
+  }
+  .cn-axora .nav-links {
+    display: none;
+  }
+  .cn-axora .hero-h1 {
+    font-size: 2.75rem;
+  }
+  .cn-axora .card-float-left,
+  .cn-axora .card-float-right {
+    width: 160px;
+    height: 100px;
+    opacity: 0.85;
+  }
+  .cn-axora .stats-cards {
+    grid-template-columns: 1fr;
+  }
+  .cn-axora .feature-card-wrap {
+    grid-template-columns: 1fr;
+    padding: 40px 28px;
+    min-height: auto;
+    gap: 32px;
+  }
+  .cn-axora .phone-mock,
+  .cn-axora .stock-wrap,
+  .cn-axora .goal-wrap {
+    margin: 0 auto;
+  }
+  .cn-axora .section-stats,
+  .cn-axora .section-feature,
+  .cn-axora .section-quote,
+  .cn-axora .section-support {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .cn-axora footer {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+  }
+}

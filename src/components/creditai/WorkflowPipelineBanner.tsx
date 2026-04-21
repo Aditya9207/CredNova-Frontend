@@ -1,0 +1,107 @@
+import { BranchesOutlined, CloudServerOutlined, RobotOutlined, LineChartOutlined } from "@ant-design/icons";
+
+/**
+ * Visual summary: PDF extraction fans out to (A) LLM spending/tips and (B) local features → online ML.
+ */
+export default function WorkflowPipelineBanner() {
+  return (
+    <div
+      className="wirely-card"
+      style={{
+        marginBottom: 24,
+        padding: "18px 20px",
+        background: "linear-gradient(135deg, rgba(91, 135, 183, 0.12) 0%, rgba(76, 175, 160, 0.08) 100%)",
+        borderColor: "rgba(91, 135, 183, 0.35)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <BranchesOutlined style={{ fontSize: 22, color: "var(--wirely-accent)" }} />
+        <h2 className="wirely-card__title" style={{ margin: 0, fontSize: 17 }}>
+          Assessment pipeline
+        </h2>
+        <span className="wirely-tag" style={{ fontSize: 11 }}>
+          PDF → dual path
+        </span>
+      </div>
+
+      <div className="workflow-pipeline-grid">
+        <div
+          style={{
+            padding: "14px 16px",
+            borderRadius: 12,
+            background: "rgba(255,255,255,0.85)",
+            border: "1px solid rgba(148, 163, 184, 0.35)",
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#64748b", marginBottom: 8 }}>
+            EXTRACT
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#0f172a", marginBottom: 6 }}>Bank statement PDF</div>
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "#475569" }}>
+            Transactions parsed to CSV; monthly UPI velocity, cash ratio, and cashflow charts are derived locally.
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "none",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minWidth: 36,
+            color: "#94a3b8",
+            fontSize: 20,
+          }}
+          className="workflow-pipeline-arrow"
+          aria-hidden
+        >
+          →
+        </div>
+
+        <div style={{ display: "grid", gridTemplateRows: "1fr 1fr", gap: 10 }}>
+          <div
+            style={{
+              padding: "12px 14px",
+              borderRadius: 10,
+              background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
+              border: "1px solid rgba(148, 163, 184, 0.2)",
+              color: "#e2e8f0",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <RobotOutlined style={{ color: "#a78bfa" }} />
+              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", color: "#94a3b8" }}>
+                PATH A · LLM
+              </span>
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.45 }}>
+              Category spend (rules + optional GPT-4o-mini): narrative and creditworthiness tips —{" "}
+              <strong style={{ color: "#c4b5fd" }}>insights only</strong>, not sent to the scoring model.
+            </div>
+          </div>
+          <div
+            style={{
+              padding: "12px 14px",
+              borderRadius: 10,
+              background: "linear-gradient(180deg, #0c4a6e 0%, #0f172a 100%)",
+              border: "1px solid rgba(56, 189, 248, 0.25)",
+              color: "#e0f2fe",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <LineChartOutlined style={{ color: "#38bdf8" }} />
+              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", color: "#7dd3fc" }}>
+                PATH B · LOCAL → ML API
+              </span>
+            </div>
+            <div style={{ fontSize: 13, lineHeight: 1.45 }}>
+              Form + statement metrics → <strong style={{ color: "#7dd3fc" }}>feature vector</strong> (local merge) →{" "}
+              <CloudServerOutlined style={{ marginInline: 4 }} />
+              remote <code style={{ fontSize: 12 }}>/predict</code> → credit score &amp; risk band.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
