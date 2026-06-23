@@ -14,18 +14,19 @@ import {
   FieldNumberOutlined,
   BankOutlined,
   CreditCardOutlined,
-  SettingOutlined,
-  ArrowRightOutlined,
   CloudUploadOutlined,
   FilePdfOutlined,
-  DeleteOutlined,
   MailOutlined,
   PhoneOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
   CameraOutlined,
   InfoCircleOutlined,
+  DeleteOutlined,
+  SettingOutlined,
+  ArrowRightOutlined,
 } from "@ant-design/icons";
+
 import { submitCreditApplicationMultipart } from "@/lib/creditApi";
 import { API_BASE } from "@/lib/apiBase";
 import "@/styles/wirely.css";
@@ -85,6 +86,7 @@ export default function CreditAIApplyPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfPassword, setPdfPassword] = useState("");
   const [panFile, setPanFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
@@ -265,7 +267,7 @@ export default function CreditAIApplyPage() {
         request_physical_asset_verification: physicalYes,
       };
 
-      const res = await submitCreditApplicationMultipart(payload, pdfFile, undefined, panFile || undefined);
+      const res = await submitCreditApplicationMultipart(payload, pdfFile, pdfPassword || undefined, panFile || undefined);
 
       console.info("[CredNova] Backend finished: PDF processed, ML model scored, record saved.", {
         applicationId: res.application_id,
@@ -885,39 +887,55 @@ export default function CreditAIApplyPage() {
                   </div>
 
                   {pdfFile && (
-                    <div
-                      className="wirely-card flex items-center justify-between"
-                      style={{ padding: 16, boxShadow: "var(--wirely-shadow-soft)" }}
-                    >
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ background: "rgba(91, 135, 183, 0.15)", color: "var(--wirely-accent)" }}
-                        >
-                          <FilePdfOutlined className="text-xl" />
+                    <div className="space-y-4">
+                      <div
+                        className="wirely-card flex items-center justify-between"
+                        style={{ padding: 16, boxShadow: "var(--wirely-shadow-soft)" }}
+                      >
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div
+                            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ background: "rgba(91, 135, 183, 0.15)", color: "var(--wirely-accent)" }}
+                          >
+                            <FilePdfOutlined className="text-xl" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-medium truncate" style={{ color: "var(--wirely-text)" }}>
+                              {pdfFile.name}
+                            </p>
+                            <span className="wirely-kpi__label flex items-center gap-1 mt-0.5">
+                              <CheckCircleOutlined style={{ color: "var(--wirely-positive)" }} /> Ready to submit
+                            </span>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-[14px] font-medium truncate" style={{ color: "var(--wirely-text)" }}>
-                            {pdfFile.name}
-                          </p>
-                          <span className="wirely-kpi__label flex items-center gap-1 mt-0.5">
-                            <CheckCircleOutlined style={{ color: "var(--wirely-positive)" }} /> Ready to submit
-                          </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPdfFile(null);
+                            setPdfPassword("");
+                            if (fileInputRef.current) fileInputRef.current.value = "";
+                          }}
+                          className="shrink-0 w-9 h-9 rounded-lg border-0 bg-transparent cursor-pointer hover:bg-red-50"
+                          style={{ color: "#b91c1c" }}
+                          aria-label="Remove file"
+                        >
+                          <DeleteOutlined />
+                        </button>
+                      </div>
+
+                      <div>
+                        <label className={labelCls}>PDF Password (Optional)</label>
+                        <div className={fieldShell}>
+                          <input
+                            className={inputCls}
+                            type="password"
+                            placeholder="Only if your PDF is password protected"
+                            value={pdfPassword}
+                            onChange={(e) => setPdfPassword(e.target.value)}
+                          />
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPdfFile(null);
-                          if (fileInputRef.current) fileInputRef.current.value = "";
-                        }}
-                        className="shrink-0 w-9 h-9 rounded-lg border-0 bg-transparent cursor-pointer hover:bg-red-50"
-                        style={{ color: "#b91c1c" }}
-                        aria-label="Remove file"
-                      >
-                        <DeleteOutlined />
-                      </button>
                     </div>
                   )}
                 </div>
@@ -956,6 +974,20 @@ export default function CreditAIApplyPage() {
                   )}
                 </button>
               </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                accept="application/pdf"
+                onChange={onPdfChange}
+              />
+              <input
+                type="file"
+                ref={panInputRef}
+                style={{ display: "none" }}
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                onChange={onPanChange}
+              />
             </form>
           </div>
         </div>

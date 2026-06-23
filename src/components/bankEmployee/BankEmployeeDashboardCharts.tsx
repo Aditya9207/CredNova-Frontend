@@ -26,6 +26,7 @@ import type {
   ScoreTrendPoint,
   ShapBarRow,
   StatementPeriod,
+  DigitalFootprintRow,
 } from "../../data/bankEmployeeMock";
 import {
   buildDummyDigitalFootprint,

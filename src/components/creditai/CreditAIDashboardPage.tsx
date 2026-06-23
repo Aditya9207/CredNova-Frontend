@@ -77,9 +77,14 @@ function initials(name: string): string {
 type StoredResult = {
   application_id: string;
   model_output: {
-    credit_score: number;
-    risk_probability: number;
-    risk_level: string;
+    // Remote Render ML model keys (primary)
+    credit_score?: number;
+    risk_probability?: number;
+    risk_level?: string;
+    // app.py internal inference keys (fallback — FE-1 fix)
+    alt_cibil_score?: number;
+    pd?: number;
+    tier?: string;
   };
   /** Local merge sent to remote /predict — Path B. */
   model_payload?: Record<string, unknown>;
@@ -110,11 +115,18 @@ export default function CreditAIDashboardPage() {
     }
     try {
       const parsed = JSON.parse(raw) as StoredResult;
+      // FE-5: validate that parsed result has the minimum required fields
+      if (!parsed || typeof parsed !== "object" || !parsed.model_output) {
+        console.warn("[CredNova] Portfolio: session data missing model_output — redirecting");
+        sessionStorage.removeItem("creditAiLastResult");
+        navigate("/credit-ai");
+        return;
+      }
       setData(parsed);
       console.info("[CredNova] Portfolio page: loaded latest assessment from sessionStorage", {
         applicationId: parsed.application_id,
-        creditScore: parsed.model_output?.credit_score,
-        riskLevel: parsed.model_output?.risk_level,
+        creditScore: parsed.model_output?.credit_score ?? parsed.model_output?.alt_cibil_score,
+        riskLevel: parsed.model_output?.risk_level ?? parsed.model_output?.tier,
         statementRows: parsed.statement_metrics?.statement_row_count,
       });
 
@@ -140,6 +152,7 @@ export default function CreditAIDashboardPage() {
       }
     } catch (e) {
       console.error("[CredNova] Portfolio: invalid session JSON", e);
+      sessionStorage.removeItem("creditAiLastResult");
       navigate("/credit-ai");
     }
   }, [navigate]);
@@ -236,7 +249,11 @@ export default function CreditAIDashboardPage() {
     );
   }
 
-  const { credit_score, risk_probability, risk_level } = data.model_output;
+  // FE-1: safe fallback — handles both remote model keys (credit_score) and
+  // app.py internal inference keys (alt_cibil_score / pd / tier)
+  const credit_score = data.model_output.credit_score ?? data.model_output.alt_cibil_score ?? 0;
+  const risk_probability = data.model_output.risk_probability ?? (1 - (data.model_output.pd ?? 0));
+  const risk_level = data.model_output.risk_level ?? data.model_output.tier ?? "—";
   const csvHref = data.application_id ? transactionsCsvUrl(data.application_id) : null;
   const showAssets = data.formSummary?.has_home === "1" || data.formSummary?.has_gold === "1";
   const displayName =
@@ -512,7 +529,11 @@ export default function CreditAIDashboardPage() {
             <Suspense fallback={<ChartBlocksSkeleton />}>
               <MlScoringCharts
                 modelPayload={data.model_payload}
-                modelOutput={data.model_output}
+                modelOutput={{
+                  credit_score,
+                  risk_probability,
+                  risk_level,
+                }}
                 statementMetrics={data.statement_metrics}
               />
               <SpendingInsightsSection insights={insights} loading={insightsLoading} error={insightsError} />

@@ -17,13 +17,24 @@ export default function Redirector() {
         return;
       }
 
+      // Abort the fetch after 5 seconds so we never hang forever
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 5000);
+
       try {
         console.log("Checking user profile for:", user.id);
 
-        const response = await fetch(`${API_BASE}/profile?clerk_user_id=${user.id}`);
+        const response = await fetch(`${API_BASE}/profile?clerk_user_id=${user.id}`, {
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Backend replied but profile doesn't exist — go to apply flow
+          console.warn(`Profile check returned ${response.status} — routing to /credit-ai`);
+          navigate("/credit-ai", { replace: true });
+          return;
         }
 
         const data = await response.json();
@@ -31,18 +42,21 @@ export default function Redirector() {
 
         // Backend returns { has_profile, profile } — not a `users` array
         const hasProfile = Boolean(data?.has_profile);
-        
+
         if (hasProfile) {
           console.log("User has profile, redirecting to credit-ai apply flow");
           navigate("/credit-ai", { replace: true });
         } else {
-          console.log("User has no profile, redirecting to profile form");
-          navigate("/profile");
+          console.log("User has no profile, redirecting to credit-ai");
+          // NOTE: /profile is an alias for /credit-ai (see App.tsx FE-3 comment)
+          navigate("/credit-ai", { replace: true });
         }
       } catch (error) {
-        console.error("Error checking user profile:", error);
-        setError("Failed to check user profile");
-        navigate("/profile");
+        clearTimeout(timeoutId);
+        // Network error / backend not running / AbortError — still let user in
+        console.error("Error checking user profile (backend may be offline):", error);
+        setError("Could not reach the server — sending you to the apply flow");
+        navigate("/credit-ai", { replace: true });
       } finally {
         setLoading(false);
       }
