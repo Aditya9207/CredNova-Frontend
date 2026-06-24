@@ -121,7 +121,20 @@ export async function submitCreditApplicationMultipart(
   if (pdfPassword) form.append('pdf_password', pdfPassword);
   if (panScan) form.append('pan_scan', panScan);
 
-  const r = await fetch(`${BASE}/credit/apply`, { method: 'POST', body: form });
+  // 180s timeout: PDF parsing + remote ML model cold start can take ~60s on Render free tier
+  const r = await fetch(`${BASE}/credit/apply`, {
+    method: 'POST',
+    body: form,
+    signal: withTimeoutMs(180_000),
+  }).catch((err: unknown) => {
+    if (err instanceof DOMException && err.name === 'TimeoutError') {
+      throw new Error('Request timed out. The server is processing your PDF — please wait a moment and try again.');
+    }
+    if (err instanceof TypeError && String(err.message).includes('fetch')) {
+      throw new Error('Could not reach the server. Make sure the backend is running and your connection is stable.');
+    }
+    throw err;
+  });
   if (!r.ok) {
     const text = await r.text();
     throw new Error(errorBodyMessage(text) || r.statusText);
