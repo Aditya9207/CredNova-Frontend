@@ -9,4 +9,17 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          "vendor-antd": ["@ant-design/icons"],
+          "vendor-clerk": ["@clerk/clerk-react"],
+          "vendor-query": ["@tanstack/react-query"],
+        },
+      },
+    },
+  },
 });
