@@ -3,7 +3,7 @@
  * Set VITE_API_URL in .env (e.g. http://127.0.0.1:8000).
  */
 
-const BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+const BASE = import.meta.env.VITE_API_URL || 'https://crednova-backend.onrender.com';
 
 /** Avoid hung UI when API or upstream ML never responds (browser fetch has no default timeout). */
 function withTimeoutMs(ms: number): AbortSignal | undefined {
