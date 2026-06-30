@@ -196,7 +196,10 @@ export default function StatementAnalysisSection({
         </h3>
         <ul style={{ margin: 0, paddingLeft: 18, color: "#1a2236", fontSize: 14, lineHeight: 1.55 }}>
           <li>
-            <strong>ML model:</strong> risk band <strong>{riskLevel}</strong> ({(riskProbability * 100).toFixed(1)}%
+            <strong>ML model:</strong> risk band <strong>{riskLevel}</strong> (
+            {typeof riskProbability === "number" && !isNaN(riskProbability)
+              ? `${(riskProbability * 100).toFixed(1)}%`
+              : "—"}
             estimated risk probability).
           </li>
           {insights.map((t, i) => (

@@ -204,13 +204,17 @@ export default function CreditAIDashboardPage() {
 
   const arcPercent = useMemo(() => {
     if (!data?.model_output) return 0;
-    const s = data.model_output.credit_score;
+    // FE-fix: use the same safe fallback chain as the render variables
+    const s = data.model_output.credit_score ?? data.model_output.alt_cibil_score ?? 0;
+    if (!s || isNaN(s)) return 0;
     return Math.min(100, Math.max(0, Math.round((s / 900) * 100)));
   }, [data]);
 
   const trendInArc = useMemo(() => {
     if (!data?.model_output) return "";
-    const rp = data.model_output.risk_probability;
+    // FE-fix: fallback pd → risk_probability like the render variables do
+    const rp = data.model_output.risk_probability ?? (1 - (data.model_output.pd ?? 0));
+    if (rp === undefined || isNaN(rp)) return "";
     if (rp < 0.28) return `+${Math.min(18, Math.round((1 - rp) * 20))}%`;
     if (rp < 0.42) return `+${Math.round((1 - rp) * 12)}%`;
     return "";
@@ -228,18 +232,21 @@ export default function CreditAIDashboardPage() {
 
   const kpiMonthlyChange = useMemo(() => {
     if (!data?.model_output) return "—";
-    const improvement = (1 - data.model_output.risk_probability) * 12.4;
+    // FE-fix: use same fallback as render so NaN% never appears
+    const rp = data.model_output.risk_probability ?? (1 - (data.model_output.pd ?? 0));
+    if (rp === undefined || isNaN(rp)) return "—";
+    const improvement = (1 - rp) * 12.4;
     const v = Math.max(0, improvement).toFixed(1);
     return `+ ${v}%`;
   }, [data]);
 
   const kpiAvgFlow = useMemo(() => {
     const inc = Number(data?.formSummary?.annual_income || 0);
-    const rows = Math.max(kpiTxnRows, 1);
-    if (!inc) return "—";
-    const m = Math.round(inc / 12 / rows);
-    return `₹${m.toLocaleString("en-IN")}`;
-  }, [data, kpiTxnRows]);
+    if (!inc || isNaN(inc)) return "—";
+    // Show monthly income (annual ÷ 12) — a meaningful credit signal
+    const monthly = Math.round(inc / 12);
+    return `₹${monthly.toLocaleString("en-IN")}`;
+  }, [data]);
 
   if (!data?.model_output) {
     return (

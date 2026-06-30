@@ -85,7 +85,11 @@ export default function MlScoringCharts({ modelPayload, modelOutput, statementMe
             }}
           >
             <div className="wirely-kpi__label">Model score</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a" }}>{modelOutput.credit_score}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a" }}>
+              {typeof modelOutput.credit_score === "number" && !isNaN(modelOutput.credit_score)
+                ? modelOutput.credit_score
+                : "—"}
+            </div>
           </div>
           <div
             style={{
@@ -98,7 +102,9 @@ export default function MlScoringCharts({ modelPayload, modelOutput, statementMe
           >
             <div className="wirely-kpi__label">Est. risk</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: "#b91c1c" }}>
-              {(modelOutput.risk_probability * 100).toFixed(1)}%
+              {typeof modelOutput.risk_probability === "number" && !isNaN(modelOutput.risk_probability)
+                ? `${(modelOutput.risk_probability * 100).toFixed(1)}%`
+                : "—"}
             </div>
           </div>
           <div
@@ -111,7 +117,9 @@ export default function MlScoringCharts({ modelPayload, modelOutput, statementMe
             }}
           >
             <div className="wirely-kpi__label">Band</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "#0f172a" }}>{modelOutput.risk_level}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "#0f172a" }}>
+              {modelOutput.risk_level || "—"}
+            </div>
           </div>
         </div>
       </div>
