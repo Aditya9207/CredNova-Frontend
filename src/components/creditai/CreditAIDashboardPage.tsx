@@ -354,24 +354,6 @@ export default function CreditAIDashboardPage() {
             </div>
           </div>
           <div className="wirely-topbar__right">
-            <div className="wirely-kpi-row">
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Pending transfers</div>
-                <div className="wirely-kpi__value">{kpiPending}</div>
-              </div>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Total transactions</div>
-                <div className="wirely-kpi__value">{kpiTxnRows.toLocaleString("en-IN")}</div>
-              </div>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Monthly change</div>
-                <div className="wirely-kpi__value wirely-kpi__value--positive">{kpiMonthlyChange}</div>
-              </div>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Avg flow / row</div>
-                <div className="wirely-kpi__value">{kpiAvgFlow}</div>
-              </div>
-            </div>
             <div className="wirely-profile">
               <div style={{ position: "relative" }}>
                 <button 
@@ -405,7 +387,7 @@ export default function CreditAIDashboardPage() {
               <UserButton 
                 appearance={{ 
                   elements: { 
-                    userButtonAvatarBox: { width: 32, height: 32 },
+                    userButtonAvatarBox: { width: 24, height: 24 },
                     userButtonPopoverCard: { zIndex: 1000 }
                   } 
                 }} 
@@ -413,6 +395,24 @@ export default function CreditAIDashboardPage() {
               <div className="wirely-profile__text">
                 <div className="wirely-profile__name">{displayName}</div>
                 <div className="wirely-profile__email">{email}</div>
+              </div>
+            </div>
+            <div className="wirely-kpi-row">
+              <div className="wirely-kpi">
+                <div className="wirely-kpi__label">Pending transfers</div>
+                <div className="wirely-kpi__value">{kpiPending}</div>
+              </div>
+              <div className="wirely-kpi">
+                <div className="wirely-kpi__label">Total transactions</div>
+                <div className="wirely-kpi__value">{kpiTxnRows.toLocaleString("en-IN")}</div>
+              </div>
+              <div className="wirely-kpi">
+                <div className="wirely-kpi__label">Monthly change</div>
+                <div className="wirely-kpi__value wirely-kpi__value--positive">{kpiMonthlyChange}</div>
+              </div>
+              <div className="wirely-kpi">
+                <div className="wirely-kpi__label">Avg flow / row</div>
+                <div className="wirely-kpi__value">{kpiAvgFlow}</div>
               </div>
             </div>
           </div>
