@@ -199,7 +199,7 @@ export default function AnalysisSpendingPanel({ insights, loading, error }: Prop
               </div>
             </div>
 
-            <div className="wirely-card" style={{ padding: 0, overflow: "hidden" }}>
+            <div className="wirely-card" style={{ padding: 16, overflowX: "auto" }}>
               <table className="wirely-table">
                 <thead>
                   <tr>

@@ -125,11 +125,8 @@ const LandingPage: FC = () => {
           <button type="button" onClick={() => navigate("/bank-employee")}>
             Bank employee
           </button>
-          <button type="button" onClick={() => navigate("/sign-in")}>
-            Log in
-          </button>
           <button type="button" className="btn-signup" onClick={onGetStarted}>
-            {isSignedIn ? "Dashboard" : "Get started"}
+            Log in
           </button>
         </div>
       </nav>
@@ -161,26 +158,29 @@ const LandingPage: FC = () => {
           <div className="hero-sub-row">
             <p className="hero-sub-text">Single flow — profile, statement PDF, and dual-path insights</p>
             <div className="store-btns">
-              <button type="button" className="store-btn" onClick={onGetStarted}>
-                <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-                </svg>
-                <span className="store-btn-text">
-                  <span className="line1">Continue on</span>
-                  <span className="line2">Web app</span>
-                </span>
-              </button>
-              <button type="button" className="store-btn" onClick={() => scrollToId("features")}>
-                <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                </svg>
-                <span className="store-btn-text">
-                  <span className="line1">Explore</span>
-                  <span className="line2">What you get</span>
-                </span>
+              <button
+                type="button"
+                className="store-btn"
+                onClick={onGetStarted}
+                style={{
+                  padding: "14px 32px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  background: "linear-gradient(135deg, #c47ab8 0%, #7b6fce 100%)",
+                  color: "#ffffff",
+                  borderRadius: "14px",
+                  border: "none",
+                  boxShadow: "0 8px 24px rgba(123, 111, 206, 0.35)",
+                  display: "flex",
+                  justifyContent: "center",
+                  minWidth: "200px",
+                  transition: "transform 0.2s, box-shadow 0.2s"
+                }}
+              >
+                {isSignedIn ? "Get started" : "Get started"}
               </button>
             </div>
+            <span className="hero-demo-badge">Portfolio demo · not a real lender</span>
           </div>
         </div>
       </section>
@@ -190,8 +190,8 @@ const LandingPage: FC = () => {
           <div className="stats-header cn-reveal">
             <h2 id="stats-heading">Insights that match your money.</h2>
             <p>
-              CredNova parses your bank PDF, merges profile + statement signals, and runs both a remote ML score and
-              AI-assisted spending narratives — so you see categories, trends, and credit-health tips in one place.
+              Upload once — CredNova parses your PDF, surfaces <strong>spending splits</strong>, and runs an ML score
+              alongside <strong>flash-card credit tips</strong> so you get a transparent view of your financial health.
             </p>
           </div>
           <div ref={sectionRef} className="stats-cards">
@@ -214,79 +214,67 @@ const LandingPage: FC = () => {
         </div>
       </section>
 
-      <section className="section-quote" aria-label="Tagline">
-        <p className="quote-text cn-reveal">
-          Upload your statement once — get spending splits, flash-card credit tips, and a transparent view of how your
-          bank behaviour feeds your score.
-        </p>
-      </section>
-
+      {/* FEATURE SECTION — neutral backgrounds, varied mock UIs, visual hierarchy: analysis card is hero */}
       <section className="section-feature" id="features">
-        <div className="feature-card-wrap cn-reveal">
+
+        {/* Card 1 (compact): Data intake — statement parsing */}
+        <div className="feature-card-wrap feature-compact cn-reveal">
           <div className="feature-left">
+            <div className="feature-tag">Data intake</div>
             <h2>Balance &amp; statement intelligence.</h2>
             <p>
-              We extract credits, debits, and UPI velocity from your PDF, consolidate monthly trends, and surface them
-              next to your declared income — so thin-file and self-employed applicants get a fairer picture than form
-              fields alone.
+              We extract credits, debits, and UPI velocity from your PDF, then consolidate monthly trends next to your
+              declared income — giving thin-file and self-employed applicants a fairer picture.
             </p>
             <button type="button" className="btn-learn" onClick={onGetStarted}>
               {isSignedIn ? "Open dashboard" : "Start assessment"}
             </button>
           </div>
-          <div>
+          <div className="feature-right-mock">
+            {/* Dashboard number view */}
             <div className="phone-mock">
               <div className="phone-top">
-                <div className="phone-menu" aria-hidden>
-                  <span />
-                  <span />
-                  <span />
-                </div>
+                <div className="phone-menu" aria-hidden><span /><span /><span /></div>
                 <div className="phone-avatar">CN</div>
               </div>
-              <div className="phone-bal-label">Illustrative eligibility band</div>
-              <div className="phone-bal-value">
-                <span className="rupee">₹</span>8,42,000
-              </div>
-              <div className="phone-cards-label">
-                <span>Primary card</span>
-                <span aria-hidden>+</span>
-              </div>
+              <div className="phone-bal-label">Parsed statement · Monthly net</div>
+              <div className="phone-bal-value"><span className="rupee">₹</span>1,18,340</div>
+              <div className="phone-cards-label"><span>Credits vs Debits</span></div>
               <div className="phone-card-visual">
-                <div className="phone-card-amount">
-                  <span className="rupee" style={{ fontSize: "0.85rem" }}>
-                    ₹
-                  </span>
-                  4,32,180<span style={{ fontSize: "0.75rem", opacity: 0.75 }}>.00</span>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <div style={{ flex: 1, height: 8, borderRadius: 4, background: "linear-gradient(90deg,#7b6fce,#c47ab8)" }} />
+                  <span style={{ fontSize: 11, color: "#888" }}>68% debit</span>
                 </div>
-                <div className="phone-card-num">*4821</div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
+                  <div style={{ flex: "0.47", height: 8, borderRadius: 4, background: "#a8e6c8" }} />
+                  <span style={{ fontSize: 11, color: "#888" }}>32% credit</span>
+                </div>
               </div>
               <div className="phone-activity">
-                <span>Activity</span>
-                <span style={{ color: "#aaa", fontSize: "12px" }}>Parsed rows · PDF</span>
+                <span>Parsed rows</span>
+                <span style={{ color: "#aaa", fontSize: "12px" }}>214 · PDF</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="feature-card-wrap lavender cn-reveal">
+        {/* Card 2 (HERO / LARGE): Analysis — real-time category view */}
+        <div className="feature-card-wrap feature-hero cn-reveal">
           <div className="feature-left">
+            <div className="feature-tag feature-tag-analysis">Analysis</div>
             <h2>Real-time category &amp; trend view.</h2>
             <p>
-              The Analysis tab breaks spending into bars, pie, and tables — food, travel, bills, investments, and more —
-              with optional OpenAI-backed narrative when your API key is configured, plus reliable rule-based copy
-              offline.
+              The Analysis tab breaks spending into categories — food, travel, bills, investments, and more — with an
+              optional AI-backed narrative and reliable rule-based copy offline. This is your primary proof surface.
             </p>
             <button type="button" className="btn-learn" onClick={() => scrollToId("support")}>
-              See support
+              See how it works
             </button>
           </div>
           <div className="stock-wrap">
             <div className="stock-group">
               <div className="stock-row">
-                <div className="stock-icon" style={{ background: "#f0eff8", color: "#7b6fce", fontSize: "12px" }}>
-                  ◆
-                </div>
+                <div className="stock-icon" style={{ background: "#f0eff8", color: "#7b6fce", fontSize: "12px" }}>◆</div>
                 <div style={{ flex: 1 }}>
                   <div className="stock-name">Food &amp; dining</div>
                   <div className="stock-sub">Debit · UPI + card</div>
@@ -297,9 +285,7 @@ const LandingPage: FC = () => {
                 </div>
               </div>
               <div className="stock-row">
-                <div className="stock-icon" style={{ background: "#f0f8f5", color: "#2d8a7c", fontWeight: 700 }}>
-                  T
-                </div>
+                <div className="stock-icon" style={{ background: "#f0f8f5", color: "#2d8a7c", fontWeight: 700 }}>T</div>
                 <div style={{ flex: 1 }}>
                   <div className="stock-name">Travel &amp; fuel</div>
                   <div className="stock-sub">Commute + trips</div>
@@ -312,9 +298,7 @@ const LandingPage: FC = () => {
             </div>
             <div className="stock-group">
               <div className="stock-row">
-                <div className="stock-icon" style={{ background: "#f5f0f8", color: "#555", fontSize: "11px" }}>
-                  ⊙
-                </div>
+                <div className="stock-icon" style={{ background: "#f5f0f8", color: "#555", fontSize: "11px" }}>⊙</div>
                 <div style={{ flex: 1 }}>
                   <div className="stock-name">Investments</div>
                   <div className="stock-sub">SIP, MF, broker debits</div>
@@ -325,9 +309,7 @@ const LandingPage: FC = () => {
                 </div>
               </div>
               <div className="stock-row">
-                <div className="stock-icon" style={{ background: "#fff8f0", color: "#c47a00", fontWeight: 700 }}>
-                  ₹
-                </div>
+                <div className="stock-icon" style={{ background: "#fff8f0", color: "#c47a00", fontWeight: 700 }}>₹</div>
                 <div style={{ flex: 1 }}>
                   <div className="stock-name">Bills &amp; utilities</div>
                   <div className="stock-sub">Rent, electricity, subs</div>
@@ -341,12 +323,14 @@ const LandingPage: FC = () => {
           </div>
         </div>
 
-        <div className="feature-card-wrap pink cn-reveal">
+        {/* Card 3 (compact): Action — goals & credit tips */}
+        <div className="feature-card-wrap feature-compact cn-reveal">
           <div className="feature-left">
+            <div className="feature-tag feature-tag-action">Action</div>
             <h2>Goals &amp; credit-health tips.</h2>
             <p>
-              Track savings-style goals alongside flash-card tips: emergency buffer, credit utilisation, and bureau-aware
-              guidance for India — all tied to what we actually see in your statement flow.
+              Track savings-style goals alongside flash-card credit tips — emergency buffer, utilisation alerts, and
+              bureau-aware guidance tied to what we actually see in your statement.
             </p>
             <button type="button" className="btn-learn" onClick={onGetStarted}>
               Build my profile
@@ -362,9 +346,7 @@ const LandingPage: FC = () => {
               </div>
             </div>
             <div className="goal-card goal-card-2">
-              <div className="goal-icon" style={{ background: "#ffe8e8" }}>
-                📈
-              </div>
+              <div className="goal-icon" style={{ background: "#ffe8e8" }}>📈</div>
               <span className="goal-name">Score uplift plan</span>
               <div>
                 <div className="goal-amount-val">3 actions</div>
@@ -372,13 +354,9 @@ const LandingPage: FC = () => {
               </div>
             </div>
             <div className="goal-bg-card" aria-hidden>
-              <div className="goal-bg-val">
-                <span style={{ fontSize: "11px", fontWeight: 600 }}>₹</span>4,32,180
-                <span style={{ fontSize: "11px", opacity: 0.65 }}>.00</span>
-              </div>
-              <div style={{ position: "absolute", bottom: 16, right: 16, fontSize: 11, color: "rgba(255,255,255,0.65)" }}>
-                *4821
-              </div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.9)" }}>Credit score band</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", marginTop: 4 }}>720–780</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 4 }}>Illustrative · CIBIL range</div>
             </div>
           </div>
         </div>
@@ -387,7 +365,7 @@ const LandingPage: FC = () => {
       <section className="section-support" id="support">
         <h2 className="cn-reveal">Guidance when you need it.</h2>
         <p className="cn-reveal">
-          CredNova is a hackathon demo — not a lender. Use Insights for suggestions; verify anything critical with a
+          CredNova is a demo — not a lender. Use Insights for suggestions; verify anything critical with a
           qualified adviser or your bank.
         </p>
         <div className="cn-reveal">
@@ -421,7 +399,7 @@ const LandingPage: FC = () => {
           <CredNovaMark className="w-9 h-9 object-contain" />
           <span>CredNova</span>
         </div>
-        <span className="footer-copy">© {new Date().getFullYear()} CredNova · Hackathon demo · Not a lender</span>
+        <span className="footer-copy">© {new Date().getFullYear()} CredNova · demo · Not a lender</span>
       </footer>
     </div>
   );

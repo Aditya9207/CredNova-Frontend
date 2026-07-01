@@ -23,9 +23,10 @@
   align-items: center;
   padding: 0 48px;
   height: 64px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .cn-axora .nav-brand {
@@ -102,7 +103,15 @@
 .cn-axora .hero-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #f5f5f7 0%, #ebebed 100%);
+  background: linear-gradient(120deg, #fcfcfd 0%, #f0f2f5 50%, #e8eaf0 100%);
+  background-size: 200% 200%;
+  animation: cnGradientMove 15s ease infinite;
+}
+
+@keyframes cnGradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .cn-axora .card-float {
@@ -194,7 +203,7 @@
   font-size: clamp(3rem, 8vw, 6.5rem);
   font-weight: 800;
   line-height: 1.02;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
   color: #0a0a0a;
   margin-bottom: 0;
 }
@@ -216,6 +225,12 @@
   color: #888;
   font-weight: 400;
 }
+.cn-axora .hero-demo-badge {
+  font-size: 11px;
+  color: #bbb;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
 .cn-axora .store-btns {
   display: flex;
   gap: 12px;
@@ -227,18 +242,19 @@
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   color: #0a0a0a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   font-family: inherit;
 }
 .cn-axora .store-btn:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(123, 111, 206, 0.15);
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(123, 111, 206, 0.3);
 }
 .cn-axora .store-btn-text .line1 {
   display: block;
@@ -293,13 +309,19 @@
   min-height: 160px;
 }
 .cn-axora .stat-card-1 {
-  background: #eef0f5;
+  background: rgba(238, 240, 245, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 .cn-axora .stat-card-2 {
-  background: #edeef8;
+  background: rgba(237, 238, 248, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 .cn-axora .stat-card-3 {
-  background: #f5eeef;
+  background: rgba(245, 238, 239, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 .cn-axora .stat-blob {
   position: absolute;
@@ -337,33 +359,44 @@
   z-index: 1;
 }
 
-/* Quote */
+/* Quote — remove gradient on long copy, keep only for short headlines */
 .cn-axora .section-quote {
-  padding: 100px 48px;
-  background: #fff;
+  display: none; /* removed: content folded into stats-header */
 }
-.cn-axora .quote-text {
-  max-width: 900px;
-  margin: 0 auto;
-  font-size: clamp(1.75rem, 4vw, 3.2rem);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  text-align: center;
-  background: linear-gradient(90deg, #c47ab8 0%, #7b6fce 60%, #5b87b7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+
 
 /* Features */
 .cn-axora .section-feature {
-  padding: 0 48px 24px;
+  padding: 0 48px 48px;
 }
+
+/* Feature tags */
+.cn-axora .feature-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin-bottom: 16px;
+}
+.cn-axora .feature-tag-analysis {
+  color: #7b6fce;
+  background: rgba(123, 111, 206, 0.08);
+}
+.cn-axora .feature-tag-action {
+  color: #c47ab8;
+  background: rgba(196, 122, 184, 0.08);
+}
+
+/* All 3 feature cards — same neutral background (icon/mock carries distinction) */
 .cn-axora .feature-card-wrap {
   max-width: 1100px;
   margin: 0 auto 20px;
-  background: #f0f1f5;
+  background: #f5f5f7;
   border-radius: 28px;
   padding: 60px 64px;
   display: grid;
@@ -373,12 +406,30 @@
   min-height: 480px;
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.cn-axora .feature-card-wrap.lavender {
+.cn-axora .feature-card-wrap:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Compact cards (1 & 3) are slightly smaller than the hero analysis card */
+.cn-axora .feature-card-wrap.feature-compact {
+  min-height: 400px;
+  padding: 48px 56px;
+}
+
+/* Hero analysis card gets extra size and a subtle purple tint to stand out */
+.cn-axora .feature-card-wrap.feature-hero {
+  min-height: 560px;
   background: #eeedf8;
+  border: 1.5px solid rgba(123, 111, 206, 0.12);
 }
+
+/* Remove old arbitrary color variants */
+.cn-axora .feature-card-wrap.lavender,
 .cn-axora .feature-card-wrap.pink {
-  background: #f5eef0;
+  background: #f5f5f7;
 }
 .cn-axora .feature-left h2 {
   font-size: clamp(1.8rem, 3.5vw, 2.8rem);
@@ -578,7 +629,7 @@
 .cn-axora .goal-wrap {
   position: relative;
   width: 320px;
-  height: 240px;
+  height: 300px;
   margin-left: auto;
 }
 .cn-axora .goal-card {
@@ -596,11 +647,19 @@
   top: 0;
   right: 0;
   z-index: 3;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .cn-axora .goal-card-2 {
-  top: 60px;
-  right: 20px;
+  top: 85px;
+  right: 0;
   z-index: 2;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cn-axora .feature-card-wrap:hover .goal-card-1 {
+  transform: translateY(-6px);
+}
+.cn-axora .feature-card-wrap:hover .goal-card-2 {
+  transform: translateY(-3px);
 }
 .cn-axora .goal-icon {
   width: 36px;
@@ -628,13 +687,17 @@
 }
 .cn-axora .goal-bg-card {
   position: absolute;
-  bottom: 0;
-  right: 10px;
-  width: 260px;
-  height: 110px;
+  top: 170px;
+  right: 0;
+  width: 280px;
+  height: 120px;
   border-radius: 18px;
   background: linear-gradient(135deg, #e8b4c8 0%, #c4b8e8 100%);
   z-index: 1;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .cn-axora .goal-bg-val {
   position: absolute;
@@ -799,11 +862,41 @@
   .cn-axora .hero-h1 {
     font-size: 2.75rem;
   }
-  .cn-axora .card-float-left,
+  .cn-axora .card-float-left {
+    display: block;
+    transform: scale(0.65) rotate(-10deg) !important;
+    top: 5%;
+    bottom: auto;
+    left: -25%;
+    opacity: 0.6;
+    animation: cnFloatLeftMobile 6s ease-in-out infinite;
+  }
   .cn-axora .card-float-right {
-    width: 160px;
-    height: 100px;
-    opacity: 0.85;
+    display: block;
+    transform: scale(0.6) rotate(12deg) !important;
+    top: auto;
+    bottom: 5%;
+    right: -25%;
+    opacity: 0.6;
+    animation: cnFloatRightMobile 7s ease-in-out infinite 1s;
+  }
+
+  @keyframes cnFloatLeftMobile {
+    0%, 100% { transform: scale(0.65) rotate(-10deg) translateY(0); }
+    50% { transform: scale(0.65) rotate(-8deg) translateY(-8px); }
+  }
+  @keyframes cnFloatRightMobile {
+    0%, 100% { transform: scale(0.6) rotate(12deg) translateY(0); }
+    50% { transform: scale(0.6) rotate(10deg) translateY(-8px); }
+  }
+  .cn-axora .nav-brand {
+    margin-right: auto;
+  }
+  .cn-axora .nav-actions {
+    gap: 12px;
+  }
+  .cn-axora .nav-actions button:not(.btn-signup) {
+    display: none; /* Hide secondary buttons on mobile */
   }
   .cn-axora .stats-cards {
     grid-template-columns: 1fr;
@@ -815,9 +908,30 @@
     gap: 32px;
   }
   .cn-axora .phone-mock,
-  .cn-axora .stock-wrap,
-  .cn-axora .goal-wrap {
+  .cn-axora .stock-wrap {
     margin: 0 auto;
+    width: 100%;
+    max-width: 320px;
+  }
+  .cn-axora .goal-wrap {
+    position: static;
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cn-axora .goal-card {
+    position: static;
+    width: 100%;
+  }
+  .cn-axora .goal-bg-card {
+    position: static;
+    width: 100%;
+    height: auto;
+    min-height: 100px;
   }
   .cn-axora .section-stats,
   .cn-axora .section-feature,

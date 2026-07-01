@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useClerk, useUser } from "@clerk/clerk-react";
+import { useClerk, useUser, UserButton } from "@clerk/clerk-react";
 import {
   BellOutlined,
   HomeOutlined,
@@ -101,6 +101,7 @@ export default function CreditAIDashboardPage() {
   const { signOut } = useClerk();
   const { user } = useUser();
   const [activeSection, setActiveSection] = useState<DashboardSection>("portfolio");
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [data, setData] = useState<StoredResult | null>(null);
   const [insights, setInsights] = useState<CreditInsightsResponse | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(true);
@@ -372,10 +373,43 @@ export default function CreditAIDashboardPage() {
               </div>
             </div>
             <div className="wirely-profile">
-              <button type="button" className="wirely-profile__bell" aria-label="Notifications">
-                <BellOutlined />
-              </button>
-              <div className="wirely-avatar">{initials(displayName)}</div>
+              <div style={{ position: "relative" }}>
+                <button 
+                  type="button" 
+                  className="wirely-profile__bell" 
+                  aria-label="Notifications"
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                >
+                  <BellOutlined />
+                  <span className="wirely-bell-badge" />
+                </button>
+                
+                {isNotificationsOpen && (
+                  <div className="wirely-notifications-dropdown">
+                    <div className="wirely-notifications-header">Notifications</div>
+                    <div className="wirely-notification-item">
+                      <strong>Assessment complete</strong>
+                      <p>Your latest statements were parsed successfully.</p>
+                    </div>
+                    <div className="wirely-notification-item">
+                      <strong>Credit insight</strong>
+                      <p>Your cash transaction ratio is above optimal levels.</p>
+                    </div>
+                    <div className="wirely-notification-item">
+                      <strong>Eligibility update</strong>
+                      <p>Illustrative limit calculated at ₹10,00,000.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <UserButton 
+                appearance={{ 
+                  elements: { 
+                    userButtonAvatarBox: { width: 32, height: 32 },
+                    userButtonPopoverCard: { zIndex: 1000 }
+                  } 
+                }} 
+              />
               <div className="wirely-profile__text">
                 <div className="wirely-profile__name">{displayName}</div>
                 <div className="wirely-profile__email">{email}</div>
