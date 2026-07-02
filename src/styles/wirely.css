@@ -31,7 +31,11 @@
   color: var(--wirely-text);
   background: var(--wirely-bg-gradient);
   min-height: 100vh;
+  /* Prevent any child element from causing horizontal scroll / zoom on mobile */
+  overflow-x: hidden;
+  max-width: 100vw;
 }
+
 
 .wirely-root *,
 .wirely-root *::before,
@@ -43,6 +47,9 @@
 .wirely-layout {
   display: flex;
   min-height: 100vh;
+  /* Prevent child overflow from causing mobile zoom */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .wirely-sidebar {
@@ -1376,12 +1383,16 @@
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--wirely-border-subtle);
-    padding: 16px 16px 12px;
+    padding: 12px 16px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     position: relative;
+    /* Override the sticky/height:100vh from desktop */
+    height: auto !important;
+    min-height: unset !important;
+    overflow-y: visible;
   }
 
   /* Bouncing arrow cue */
@@ -1389,8 +1400,7 @@
     content: "›";
     position: absolute;
     right: 6px;
-    bottom: 20px;
-    /* Aligned vertically with the center of the nav buttons */
+    bottom: 14px;
     width: 32px;
     height: 32px;
     background: rgba(255, 255, 255, 0.9);
@@ -1460,6 +1470,22 @@
 
   .wirely-main {
     padding: 16px;
+  }
+
+  /* ---- Apply page: remove excess padding so form shows immediately ---- */
+  .wirely-apply-main {
+    padding: 12px 16px 24px;
+    align-items: stretch;
+  }
+
+  .wirely-stepper {
+    padding: 0 8px;
+    margin-bottom: 16px;
+  }
+
+  /* Hide step labels on very small screens to save vertical space */
+  .wirely-step__label {
+    display: none;
   }
 
   .wirely-page-title {
