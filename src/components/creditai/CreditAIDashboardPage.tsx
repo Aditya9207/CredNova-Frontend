@@ -102,6 +102,7 @@ export default function CreditAIDashboardPage() {
   const { user } = useUser();
   const [activeSection, setActiveSection] = useState<DashboardSection>("portfolio");
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [data, setData] = useState<StoredResult | null>(null);
   const [insights, setInsights] = useState<CreditInsightsResponse | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(true);
@@ -279,8 +280,22 @@ export default function CreditAIDashboardPage() {
 
   return (
     <div className="wirely-root wirely-layout">
-      <aside className="wirely-sidebar">
+      {/* Mobile drawer backdrop */}
+      {mobileNavOpen && (
+        <div className="wirely-drawer-backdrop" onClick={() => setMobileNavOpen(false)} />
+      )}
+
+      {/* Sidebar — desktop: fixed left column | mobile: slide-in drawer */}
+      <aside className={`wirely-sidebar${mobileNavOpen ? " wirely-sidebar--open" : ""}`}>
         <div className="wirely-sidebar__brand">
+          <button
+            type="button"
+            className="wirely-hamburger"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
           <CredNovaMark className="wirely-sidebar__logo" />
           <span className="wirely-sidebar__title">CredNova</span>
         </div>
@@ -288,7 +303,7 @@ export default function CreditAIDashboardPage() {
           <button
             type="button"
             className={`wirely-sidebar__link ${activeSection === "portfolio" ? "wirely-sidebar__link--active" : ""}`}
-            onClick={() => setActiveSection("portfolio")}
+            onClick={() => { setMobileNavOpen(false); setActiveSection("portfolio"); }}
           >
             <DashboardOutlined style={{ marginRight: 8 }} />
             My portfolio
@@ -296,7 +311,7 @@ export default function CreditAIDashboardPage() {
           <button
             type="button"
             className={`wirely-sidebar__link ${activeSection === "insights" ? "wirely-sidebar__link--active" : ""}`}
-            onClick={() => setActiveSection("insights")}
+            onClick={() => { setMobileNavOpen(false); setActiveSection("insights"); }}
           >
             <BulbOutlined style={{ marginRight: 8 }} />
             Insights
@@ -304,23 +319,22 @@ export default function CreditAIDashboardPage() {
           <button
             type="button"
             className={`wirely-sidebar__link ${activeSection === "analysis" ? "wirely-sidebar__link--active" : ""}`}
-            onClick={() => setActiveSection("analysis")}
+            onClick={() => { setMobileNavOpen(false); setActiveSection("analysis"); }}
           >
             <AreaChartOutlined style={{ marginRight: 8 }} />
             Analysis
           </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => navigate("/credit-ai")}>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai"); }}>
             <FormOutlined style={{ marginRight: 8 }} />
             New application
           </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => navigate("/")}>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/"); }}>
             <HomeOutlined style={{ marginRight: 8 }} />
             Home
           </button>
           <button
             type="button"
-            className="wirely-sidebar__link"
-            style={{ marginTop: "auto" }}
+            className="wirely-sidebar__link wirely-sidebar__link--signout"
             onClick={() => void signOut().then(() => navigate("/sign-in"))}
           >
             <SettingOutlined style={{ marginRight: 8 }} />
@@ -328,6 +342,22 @@ export default function CreditAIDashboardPage() {
           </button>
         </nav>
       </aside>
+
+      {/* Mobile top bar */}
+      <div className="wirely-mobile-topbar">
+        <button
+          type="button"
+          className="wirely-hamburger-btn"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="Open menu"
+        >
+          <span /><span /><span />
+        </button>
+        <div className="wirely-mobile-topbar__brand">
+          <CredNovaMark className="wirely-sidebar__logo" />
+          <span className="wirely-sidebar__title">CredNova</span>
+        </div>
+      </div>
 
       <div className="wirely-main">
         <header className="wirely-topbar">

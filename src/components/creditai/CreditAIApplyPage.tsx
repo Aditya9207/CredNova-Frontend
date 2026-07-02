@@ -82,6 +82,7 @@ export default function CreditAIApplyPage() {
   const { user } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const panInputRef = useRef<HTMLInputElement>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -375,27 +376,45 @@ export default function CreditAIApplyPage() {
         />
       ) : null}
 
-      <aside className="wirely-sidebar">
+      {/* Mobile drawer backdrop */}
+      {mobileNavOpen && (
+        <div
+          className="wirely-drawer-backdrop"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — desktop: fixed left column | mobile: slide-in drawer */}
+      <aside className={`wirely-sidebar${mobileNavOpen ? " wirely-sidebar--open" : ""}`}>
         <div className="wirely-sidebar__brand">
+          {/* Hamburger toggle — mobile only */}
+          <button
+            type="button"
+            className="wirely-hamburger"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
           <CredNovaMark className="wirely-sidebar__logo" />
           <span className="wirely-sidebar__title">CredNova</span>
         </div>
         <nav className="wirely-sidebar__nav">
-          <button type="button" className="wirely-sidebar__link wirely-sidebar__link--active">
+          <button type="button" className="wirely-sidebar__link wirely-sidebar__link--active" onClick={() => setMobileNavOpen(false)}>
             <HomeOutlined style={{ marginRight: 8 }} />
             Apply
           </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => navigate("/credit-ai/dashboard")}>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai/dashboard"); }}>
             <UserOutlined style={{ marginRight: 8 }} />
             Dashboard
           </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => navigate("/")}>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/"); }}>
+            <HomeOutlined style={{ marginRight: 8 }} />
             Home
           </button>
           <button
             type="button"
-            className="wirely-sidebar__link"
-            style={{ marginTop: "auto" }}
+            className="wirely-sidebar__link wirely-sidebar__link--signout"
             onClick={() => void signOut().then(() => navigate("/sign-in"))}
           >
             <LogoutOutlined style={{ marginRight: 8 }} />
@@ -403,6 +422,22 @@ export default function CreditAIApplyPage() {
           </button>
         </nav>
       </aside>
+
+      {/* Mobile top bar with hamburger toggle */}
+      <div className="wirely-mobile-topbar">
+        <button
+          type="button"
+          className="wirely-hamburger-btn"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="Open menu"
+        >
+          <span /><span /><span />
+        </button>
+        <div className="wirely-mobile-topbar__brand">
+          <CredNovaMark className="wirely-sidebar__logo" />
+          <span className="wirely-sidebar__title">CredNova</span>
+        </div>
+      </div>
 
       <div className="wirely-apply-main">
         <div className="wirely-breadcrumb" style={{ width: "100%", maxWidth: 800 }}>
