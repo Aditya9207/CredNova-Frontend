@@ -154,7 +154,7 @@ export default function AnalysisSpendingPanel({ insights, loading, error }: Prop
               display: "grid",
               gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
               gap: 20,
-              alignItems: "start",
+              alignItems: "stretch",
             }}
             className="analysis-spending-split"
           >

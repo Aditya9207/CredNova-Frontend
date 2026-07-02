@@ -14,6 +14,8 @@ import {
   DashboardOutlined,
   BulbOutlined,
   AreaChartOutlined,
+  LogoutOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import {
   fetchCreditApplication,
@@ -102,6 +104,8 @@ export default function CreditAIDashboardPage() {
   const { user } = useUser();
   const [activeSection, setActiveSection] = useState<DashboardSection>("portfolio");
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [data, setData] = useState<StoredResult | null>(null);
   const [insights, setInsights] = useState<CreditInsightsResponse | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(true);
@@ -279,57 +283,114 @@ export default function CreditAIDashboardPage() {
 
   return (
     <div className="wirely-root wirely-layout">
-      <aside className="wirely-sidebar">
+      {/* Mobile drawer backdrop */}
+      {mobileNavOpen && (
+        <div className="wirely-drawer-backdrop" onClick={() => setMobileNavOpen(false)} />
+      )}
+
+      {/* Sidebar — desktop: fixed left column | mobile: slide-in drawer */}
+      <aside className={`wirely-sidebar${mobileNavOpen ? " wirely-sidebar--open" : ""}${isCollapsed ? " wirely-sidebar--collapsed" : ""}`}>
         <div className="wirely-sidebar__brand">
+          <button
+            type="button"
+            className="wirely-hamburger"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+          <CredNovaMark className="wirely-sidebar__logo" />
+          <span className="wirely-sidebar__title">CredNova</span>
+          <button 
+            className="wirely-sidebar__toggle" 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            aria-label="Toggle sidebar"
+          >
+            <MenuOutlined />
+          </button>
+        </div>
+        <nav className="wirely-sidebar__nav">
+          <button type="button" className={`wirely-sidebar__link ${activeSection === "portfolio" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("portfolio"); setMobileNavOpen(false); }}>
+            <DashboardOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">My portfolio</span>
+          </button>
+          
+          <button type="button" className={`wirely-sidebar__link ${activeSection === "insights" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("insights"); setMobileNavOpen(false); }}>
+            <BulbOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">Insights</span>
+          </button>
+          
+          <button type="button" className={`wirely-sidebar__link ${activeSection === "analysis" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("analysis"); setMobileNavOpen(false); }}>
+            <AreaChartOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">Analysis</span>
+          </button>
+          
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai"); }}>
+            <FormOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">New application</span>
+          </button>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/"); }}>
+            <HomeOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">Home</span>
+          </button>
+        </nav>
+        
+        <div className="wirely-sidebar__profile-section" style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid rgba(180, 190, 210, 0.2)", display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px" }}>
+            <UserButton 
+              appearance={{ 
+                elements: { 
+                  userButtonAvatarBox: { width: 32, height: 32 },
+                  userButtonPopoverCard: { zIndex: 1000 }
+                } 
+              }} 
+            />
+            <div className="wirely-profile__text" style={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--wirely-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</div>
+              <div style={{ fontSize: 12, color: "var(--wirely-text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{email}</div>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            className="wirely-sidebar__link wirely-sidebar__link--signout" 
+            aria-label="Logout"
+            onClick={() => void signOut().then(() => navigate("/sign-in"))}
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              justifyContent: "center",
+              padding: "10px",
+              borderRadius: "24px",
+              border: "1px solid rgba(180, 190, 210, 0.3)",
+              background: "rgba(255, 255, 255, 0.5)",
+              color: "#ef4444",
+              fontWeight: 500
+            }}
+          >
+            <LogoutOutlined style={{ fontSize: 16 }} />
+            <span className="wirely-sidebar__link-text">Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile top bar */}
+      <div className="wirely-mobile-topbar">
+        <button
+          type="button"
+          className="wirely-hamburger-btn"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="Open menu"
+        >
+          <span /><span /><span />
+        </button>
+        <div className="wirely-mobile-topbar__brand">
           <CredNovaMark className="wirely-sidebar__logo" />
           <span className="wirely-sidebar__title">CredNova</span>
         </div>
-        <nav className="wirely-sidebar__nav">
-          <button
-            type="button"
-            className={`wirely-sidebar__link ${activeSection === "portfolio" ? "wirely-sidebar__link--active" : ""}`}
-            onClick={() => setActiveSection("portfolio")}
-          >
-            <DashboardOutlined style={{ marginRight: 8 }} />
-            My portfolio
-          </button>
-          <button
-            type="button"
-            className={`wirely-sidebar__link ${activeSection === "insights" ? "wirely-sidebar__link--active" : ""}`}
-            onClick={() => setActiveSection("insights")}
-          >
-            <BulbOutlined style={{ marginRight: 8 }} />
-            Insights
-          </button>
-          <button
-            type="button"
-            className={`wirely-sidebar__link ${activeSection === "analysis" ? "wirely-sidebar__link--active" : ""}`}
-            onClick={() => setActiveSection("analysis")}
-          >
-            <AreaChartOutlined style={{ marginRight: 8 }} />
-            Analysis
-          </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => navigate("/credit-ai")}>
-            <FormOutlined style={{ marginRight: 8 }} />
-            New application
-          </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => navigate("/")}>
-            <HomeOutlined style={{ marginRight: 8 }} />
-            Home
-          </button>
-          <button
-            type="button"
-            className="wirely-sidebar__link"
-            style={{ marginTop: "auto" }}
-            onClick={() => void signOut().then(() => navigate("/sign-in"))}
-          >
-            <SettingOutlined style={{ marginRight: 8 }} />
-            Sign out
-          </button>
-        </nav>
-      </aside>
+      </div>
 
-      <div className="wirely-main">
+      <div className={`wirely-main${isCollapsed ? " wirely-main--collapsed" : ""}`}>
         <header className="wirely-topbar">
           <div className="wirely-hero">
             <div className="wirely-breadcrumb">
@@ -354,16 +415,17 @@ export default function CreditAIDashboardPage() {
             </div>
           </div>
           <div className="wirely-topbar__right">
-            <div className="wirely-profile">
+            <div className="wirely-profile" style={{ padding: "6px 16px 6px 6px", borderRadius: "24px", background: "#ffffff", border: "1px solid rgba(180, 190, 210, 0.2)", gap: 16 }}>
               <div style={{ position: "relative" }}>
                 <button 
                   type="button" 
                   className="wirely-profile__bell" 
                   aria-label="Notifications"
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                  style={{ width: 34, height: 34, background: "transparent", borderColor: "rgba(180, 190, 210, 0.3)" }}
                 >
-                  <BellOutlined />
-                  <span className="wirely-bell-badge" />
+                  <BellOutlined style={{ fontSize: 16, color: "#6b7a90" }} />
+                  <span className="wirely-bell-badge" style={{ background: "#14b8a6", top: -2, right: -2, width: 8, height: 8 }} />
                 </button>
                 
                 {isNotificationsOpen && (
@@ -384,18 +446,28 @@ export default function CreditAIDashboardPage() {
                   </div>
                 )}
               </div>
-              <UserButton 
-                appearance={{ 
-                  elements: { 
-                    userButtonAvatarBox: { width: 24, height: 24 },
-                    userButtonPopoverCard: { zIndex: 1000 }
-                  } 
-                }} 
-              />
-              <div className="wirely-profile__text">
-                <div className="wirely-profile__name">{displayName}</div>
-                <div className="wirely-profile__email">{email}</div>
-              </div>
+
+              <button 
+                type="button" 
+                aria-label="Logout"
+                onClick={() => void signOut().then(() => navigate("/sign-in"))}
+                style={{ 
+                  margin: 0, 
+                  padding: 0, 
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  background: "transparent",
+                  border: "none",
+                  color: "#ef4444",
+                  cursor: "pointer"
+                }}
+              >
+                <LogoutOutlined style={{ fontSize: 16 }} />
+                Logout
+              </button>
             </div>
             <div className="wirely-kpi-row">
               <div className="wirely-kpi">
@@ -443,7 +515,7 @@ export default function CreditAIDashboardPage() {
                     </div>
                   </div>
                   <div className="wirely-ops-row__right">
-                    <input className="wirely-search" type="search" placeholder="Search insights…" readOnly />
+                    
                     {suggestions.map((s, i) => (
                       <div key={i} className="wirely-contact">
                         <div className="wirely-avatar">{initials(s.text)}</div>
@@ -453,9 +525,7 @@ export default function CreditAIDashboardPage() {
                         </div>
                       </div>
                     ))}
-                    <button type="button" className="wirely-btn wirely-btn--ghost" style={{ width: "100%", marginTop: 8 }}>
-                      View all <RightOutlined />
-                    </button>
+                    
                   </div>
                 </div>
               </div>
