@@ -24,12 +24,6 @@ const NotFound = () => {
           <a href="/" className="wirely-btn inline-flex no-underline">
             Home
           </a>
-          <a
-            href="/bank-employee"
-            className="inline-flex rounded-lg border border-slate-200 bg-white px-4 py-2 text-[14px] font-medium text-[#475569] no-underline hover:bg-slate-50"
-          >
-            Bank portal
-          </a>
         </div>
       </div>
     </div>

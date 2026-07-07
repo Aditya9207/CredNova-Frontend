@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE } from "@/lib/apiBase";
+import { toast } from "sonner";
+
 export default function Redirector() {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,6 +18,20 @@ export default function Redirector() {
       if (!isSignedIn || !user) {
         navigate("/sign-in");
         return;
+      }
+
+      const sessionRole = sessionStorage.getItem("loginRole");
+      const roleParam = searchParams.get("role") || sessionRole;
+      
+      if (roleParam === "admin") {
+        if (user.publicMetadata?.role === "admin") {
+          navigate("/bank-employee", { replace: true });
+          return;
+        } else {
+          toast.error("Unauthorized: Admin access denied, redirecting to user dashboard");
+          navigate("/credit-ai", { replace: true });
+          return;
+        }
       }
 
       // Abort the fetch after 5 seconds so we never hang forever

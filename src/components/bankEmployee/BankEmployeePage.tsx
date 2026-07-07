@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
 import { toast } from "sonner";
 import {
   bankEmployeeAnalyzeCsv,
@@ -100,6 +101,7 @@ function stepVisual(key: FlowStep, current: FlowStep): "done" | "current" | "tod
 }
 
 const BankEmployeePage: FC = () => {
+  const { signOut } = useAuth();
   const [flow, setFlow] = useState<FlowStep>("entry");
   const [pan, setPan] = useState("");
   const [aadhaar, setAadhaar] = useState("");
@@ -281,6 +283,13 @@ const BankEmployeePage: FC = () => {
               className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
             >
               Reset portal
+            </button>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-red-600 shadow-sm hover:bg-red-50"
+            >
+              Sign out
             </button>
           </div>
         </div>

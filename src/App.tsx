@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, RedirectToSignIn, useUser } from "@clerk/clerk-react";
 
 import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
@@ -33,13 +33,36 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useUser();
+  const isAdmin = user?.publicMetadata?.role === "admin";
+
+  return (
+    <>
+      <SignedIn>
+        {isAdmin ? children : <Navigate to="/credit-ai" replace />}
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn redirectUrl={window.location.pathname} />
+      </SignedOut>
+    </>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster richColors position="top-center" />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/bank-employee" element={<BankEmployeePage />} />
+        <Route
+          path="/bank-employee"
+          element={
+            <AdminRoute>
+              <BankEmployeePage />
+            </AdminRoute>
+          }
+        />
         <Route path="/marketing" element={<Navigate to="/" replace />} />
         <Route path="/sign-up/*" element={<SignUpPage />} />
         <Route path="/sign-in/*" element={<SignInPage />} />

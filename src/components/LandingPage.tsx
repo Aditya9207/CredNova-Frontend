@@ -122,9 +122,6 @@ const LandingPage: FC = () => {
           </button>
         </div>
         <div className="nav-actions">
-          <button type="button" onClick={() => navigate("/bank-employee")}>
-            Bank employee
-          </button>
           <button type="button" className="btn-signup" onClick={onGetStarted}>
             Log in
           </button>
@@ -355,7 +352,7 @@ const LandingPage: FC = () => {
             </div>
             <div className="goal-bg-card" aria-hidden>
               <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.9)" }}>Credit score band</div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", marginTop: 4 }}>720–780</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", marginTop: 4 }}>300–900</div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 4 }}>Illustrative · CIBIL range</div>
             </div>
           </div>
