@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useClerk, useUser, UserButton } from "@clerk/clerk-react";
 import { toast } from "sonner";
@@ -30,10 +30,14 @@ import {
   BulbOutlined,
   AreaChartOutlined,
   FormOutlined,
+  FolderOpenOutlined,
+  SyncOutlined,
+  CheckCircleFilled,
 } from "@ant-design/icons";
 
 import { submitCreditApplicationMultipart } from "@/lib/creditApi";
 import { API_BASE } from "@/lib/apiBase";
+import { runPanOcr } from "@/lib/panOcr";
 import "@/styles/wirely.css";
 import { CredNovaMark } from "@/components/CredNovaMark";
 import CredNovaMaterialLoader from "./CredNovaMaterialLoader";
@@ -87,6 +91,7 @@ export default function CreditAIApplyPage() {
   const { user } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const panInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -94,6 +99,8 @@ export default function CreditAIApplyPage() {
   const [step, setStep] = useState(1);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfPassword, setPdfPassword] = useState("");
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrDone, setOcrDone] = useState(false);
 
   const displayName = user?.fullName || "Applicant";
   const email = user?.primaryEmailAddress?.emailAddress || "applicant@crednova.app";
@@ -321,7 +328,7 @@ export default function CreditAIApplyPage() {
         "[CredNova] Portfolio data written to sessionStorage; navigating to /credit-ai/dashboard (My portfolio)"
       );
       toast.success("Application submitted successfully.");
-      navigate("/credit-ai/dashboard");
+      navigate("/credit-ai/dashboard?section=analysis");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Request failed";
       console.error("[CredNova] Submit failed:", err);
@@ -333,6 +340,7 @@ export default function CreditAIApplyPage() {
 
   const onPickPdf = () => fileInputRef.current?.click();
   const onPickPan = () => panInputRef.current?.click();
+  const onPickCamera = () => cameraInputRef.current?.click();
 
   const onPdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -343,15 +351,11 @@ export default function CreditAIApplyPage() {
     setPdfFile(f || null);
   };
 
-  const onPanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) {
-      setPanFile(null);
-      return;
-    }
+  /** Shared handler: validates the PAN image file, sets it, then runs OCR. */
+  const handlePanFileSelected = useCallback(async (f: File) => {
     const ok = /^image\/(jpeg|png|webp|jpg)$/.test(f.type) || f.type === "application/pdf";
     if (!ok) {
-      toast.error("Upload a JPG, PNG, WebP, or PDF for PAN.");
+      toast.error("Upload a JPG, PNG, or WebP image for PAN.");
       return;
     }
     if (f.size > 8 * 1024 * 1024) {
@@ -359,6 +363,43 @@ export default function CreditAIApplyPage() {
       return;
     }
     setPanFile(f);
+    setOcrDone(false);
+
+    // Skip OCR for PDFs — Tesseract works best on images
+    if (f.type === "application/pdf") return;
+
+    setOcrLoading(true);
+    try {
+      const result = await runPanOcr(f);
+      const updates: Record<string, string> = {};
+      if (result.pan_number) updates.pan_number = result.pan_number;
+      if (result.date_of_birth) updates.date_of_birth = result.date_of_birth;
+      if (result.full_name) updates.full_name = result.full_name;
+
+      if (Object.keys(updates).length > 0) {
+        setFormData((prev) => ({ ...prev, ...updates }));
+        toast.info("Fields auto-filled from PAN card — please verify.");
+        setOcrDone(true);
+      } else {
+        toast.warning("Could not read PAN card clearly. Please fill fields manually.");
+      }
+    } catch {
+      toast.warning("OCR failed — please fill fields manually.");
+    } finally {
+      setOcrLoading(false);
+    }
+  }, []);
+
+  const onPanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) { setPanFile(null); return; }
+    void handlePanFileSelected(f);
+  };
+
+  const onCameraChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    void handlePanFileSelected(f);
   };
 
   return (
@@ -376,6 +417,15 @@ export default function CreditAIApplyPage() {
         accept="image/jpeg,image/png,image/webp,application/pdf"
         className="hidden"
         onChange={onPanChange}
+      />
+      {/* Camera capture input — uses device camera app */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={onCameraChange}
       />
 
       {loading ? (
@@ -416,17 +466,17 @@ export default function CreditAIApplyPage() {
           </button>
         </div>
         <nav className="wirely-sidebar__nav">
-          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/dashboard"); }}>
-            <DashboardOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
-            <span className="wirely-sidebar__link-text">My portfolio</span>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai/dashboard?section=analysis"); }}>
+            <AreaChartOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">Analysis</span>
           </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/dashboard"); }}>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai/dashboard?section=insights"); }}>
             <BulbOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">Insights</span>
           </button>
-          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/dashboard"); }}>
-            <AreaChartOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
-            <span className="wirely-sidebar__link-text">Analysis</span>
+          <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai/dashboard?section=portfolio"); }}>
+            <DashboardOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">My portfolio</span>
           </button>
           <button type="button" className="wirely-sidebar__link wirely-sidebar__link--active" onClick={() => setMobileNavOpen(false)}>
             <FormOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
@@ -630,24 +680,71 @@ export default function CreditAIApplyPage() {
                         </div>
                       </div>
                       <div>
-                        <label className={labelCls}>PAN scan (optional)</label>
-                        <button
-                          type="button"
-                          onClick={onPickPan}
-                          className={`${fieldShell} w-full cursor-pointer justify-start gap-2`}
-                        >
-                          <CameraOutlined className="ml-4 text-[#6b7a90]" />
-                          <span className="text-[14px] text-[#6b7a90] py-3.5">
-                            {panFile ? panFile.name : "JPG, PNG, PDF — max 8MB"}
-                          </span>
-                        </button>
-                        {panFile && (
+                        <label className={labelCls}>PAN photo / scan (optional)</label>
+
+                        {/* Two-button row: Upload from device + Use camera */}
+                        <div style={{ display: "flex", gap: 8 }}>
                           <button
                             type="button"
-                            className="text-[12px] text-red-600 mt-2 font-medium"
+                            onClick={onPickPan}
+                            className={`${fieldShell} flex-1 cursor-pointer justify-start gap-2`}
+                            title="Upload from device"
+                          >
+                            <FolderOpenOutlined className="ml-3 text-[#6b7a90] shrink-0" />
+                            <span className="text-[13px] text-[#6b7a90] py-3.5 truncate">
+                              {panFile ? panFile.name : "Upload file"}
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={onPickCamera}
+                            title="Use camera"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              padding: "0 16px",
+                              borderRadius: 12,
+                              border: "1.5px solid rgba(91,135,183,0.45)",
+                              background: "rgba(91,135,183,0.08)",
+                              color: "var(--wirely-accent)",
+                              fontWeight: 600,
+                              fontSize: 13,
+                              cursor: "pointer",
+                              whiteSpace: "nowrap",
+                              transition: "background 0.2s",
+                            }}
+                          >
+                            <CameraOutlined style={{ fontSize: 16 }} />
+                            <span>Camera</span>
+                          </button>
+                        </div>
+
+                        {/* OCR status indicator */}
+                        {ocrLoading && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 12, color: "var(--wirely-accent)" }}>
+                            <SyncOutlined spin />
+                            <span>Reading PAN card…</span>
+                          </div>
+                        )}
+                        {!ocrLoading && ocrDone && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 12, color: "#16a34a" }}>
+                            <CheckCircleFilled />
+                            <span>Auto-filled · please verify the values above</span>
+                          </div>
+                        )}
+
+                        {/* Remove file */}
+                        {panFile && !ocrLoading && (
+                          <button
+                            type="button"
+                            className="text-[12px] text-red-600 mt-2 font-medium block"
                             onClick={() => {
                               setPanFile(null);
+                              setOcrDone(false);
                               if (panInputRef.current) panInputRef.current.value = "";
+                              if (cameraInputRef.current) cameraInputRef.current.value = "";
                             }}
                           >
                             Remove file

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useClerk, useUser, UserButton } from "@clerk/clerk-react";
 import {
   BellOutlined,
@@ -102,7 +102,8 @@ export default function CreditAIDashboardPage() {
   const navigate = useNavigate();
   const { signOut } = useClerk();
   const { user } = useUser();
-  const [activeSection, setActiveSection] = useState<DashboardSection>("portfolio");
+  const location = useLocation();
+  const [activeSection, setActiveSection] = useState<DashboardSection>("analysis");
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -161,6 +162,15 @@ export default function CreditAIDashboardPage() {
       navigate("/credit-ai");
     }
   }, [navigate]);
+
+  // Read ?section= param from URL to set the initial active section
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const sec = params.get("section") as DashboardSection | null;
+    if (sec && ["portfolio", "insights", "analysis"].includes(sec)) {
+      setActiveSection(sec);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     if (!data?.application_id) {
@@ -310,9 +320,9 @@ export default function CreditAIDashboardPage() {
           </button>
         </div>
         <nav className="wirely-sidebar__nav">
-          <button type="button" className={`wirely-sidebar__link ${activeSection === "portfolio" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("portfolio"); setMobileNavOpen(false); }}>
-            <DashboardOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
-            <span className="wirely-sidebar__link-text">My portfolio</span>
+          <button type="button" className={`wirely-sidebar__link ${activeSection === "analysis" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("analysis"); setMobileNavOpen(false); }}>
+            <AreaChartOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">Analysis</span>
           </button>
           
           <button type="button" className={`wirely-sidebar__link ${activeSection === "insights" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("insights"); setMobileNavOpen(false); }}>
@@ -320,9 +330,9 @@ export default function CreditAIDashboardPage() {
             <span className="wirely-sidebar__link-text">Insights</span>
           </button>
           
-          <button type="button" className={`wirely-sidebar__link ${activeSection === "analysis" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("analysis"); setMobileNavOpen(false); }}>
-            <AreaChartOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
-            <span className="wirely-sidebar__link-text">Analysis</span>
+          <button type="button" className={`wirely-sidebar__link ${activeSection === "portfolio" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("portfolio"); setMobileNavOpen(false); }}>
+            <DashboardOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <span className="wirely-sidebar__link-text">My portfolio</span>
           </button>
           
           <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai"); }}>
