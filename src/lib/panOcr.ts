@@ -2,6 +2,9 @@
  * panOcr.ts
  * Browser-side OCR for Indian PAN cards using Tesseract.js v7 (lazy-loaded).
  * Extracts: pan_number, date_of_birth, full_name.
+ *
+ * worker.min.js is served from /tesseract/worker.min.js (public folder).
+ * Language data and WASM core are loaded from jsDelivr CDN.
  */
 
 export interface PanOcrResult {
@@ -25,18 +28,16 @@ export async function runPanOcr(
   file: File,
   onProgress?: (pct: number) => void
 ): Promise<PanOcrResult> {
-  const Tesseract = await import("tesseract.js");
-  const { createWorker, PSM } = Tesseract;
+  const { createWorker, PSM } = await import("tesseract.js");
 
-  // v7: createWorker(langs, oem, options)
-  // workerPath / corePath / langPath must be explicit CDN URLs in production
-  const CDN = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist";
-  const LANG_CDN = "https://cdn.jsdelivr.net/npm/tesseract.js-data@4.0.0/";
+  // worker.min.js is in public/tesseract/ -> served at /tesseract/worker.min.js
+  const workerPath = `${window.location.origin}/tesseract/worker.min.js`;
 
   const worker = await createWorker("eng", 1, {
-    workerPath: `${CDN}/worker.min.js`,
-    langPath: LANG_CDN,
-    corePath: `${CDN}/tesseract-core-lstm.wasm.js`,
+    workerPath,
+    workerBlobURL: false,
+    langPath: "https://cdn.jsdelivr.net/npm/tesseract.js-data@4.0.0",
+    corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.0/tesseract-core-lstm.wasm.js",
     logger: (m: { status: string; progress?: number }) => {
       console.log("[PAN OCR]", m.status, m.progress);
       if (m.status === "recognizing text" && onProgress) {
@@ -77,7 +78,7 @@ export async function runPanOcr(
     if (iso) result.date_of_birth = iso;
   }
 
-  // Name extraction
+  // Name: line after "Name" label, or longest all-caps line
   const knownLabels = new Set([
     "INCOME TAX DEPARTMENT", "GOVT OF INDIA", "GOVERNMENT OF INDIA",
     "PERMANENT ACCOUNT NUMBER", "INCOME TAX", "DATE OF BIRTH",
