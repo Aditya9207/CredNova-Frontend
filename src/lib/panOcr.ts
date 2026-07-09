@@ -1,7 +1,6 @@
 /**
  * panOcr.ts
  * Browser-side OCR for Indian PAN cards using Tesseract.js v7.
- * Applies canvas preprocessing (grayscale + contrast) before OCR.
  * All assets served locally from /tesseract/.
  */
 
@@ -12,7 +11,9 @@ export interface PanOcrResult {
 }
 
 function toDobIso(raw: string): string | undefined {
-  const m = raw.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+  // Replace common OCR errors in dates like . or , instead of / or -
+  const cleaned = raw.replace(/[\.,\s]/g, "/");
+  const m = cleaned.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
   if (!m) return undefined;
   const [, dd, mm, yyyy] = m;
   const d = Number(dd), mo = Number(mm), y = Number(yyyy);
@@ -21,10 +22,6 @@ function toDobIso(raw: string): string | undefined {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-/**
- * Preprocesses the image: converts to greyscale and boosts contrast
- * so Tesseract can read compressed/dark PAN card photos more accurately.
- */
 async function preprocessImage(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -32,9 +29,10 @@ async function preprocessImage(file: File): Promise<Blob> {
 
     img.onload = () => {
       URL.revokeObjectURL(url);
-
-      // Scale up small images (camera photos are usually large enough)
-      const scale = Math.max(1, 1200 / img.width);
+      
+      // Scale image to a reasonable size for OCR (not too big, not too small)
+      // Tesseract works best when text x-height is ~20px
+      const scale = Math.max(1, 1500 / img.width);
       const w = Math.round(img.width * scale);
       const h = Math.round(img.height * scale);
 
@@ -43,45 +41,34 @@ async function preprocessImage(file: File): Promise<Blob> {
       canvas.height = h;
       const ctx = canvas.getContext("2d")!;
 
-      // Draw original
       ctx.drawImage(img, 0, 0, w, h);
 
-      // Apply greyscale + contrast filter via pixel manipulation
+      // Mild contrast boost + grayscale
       const imageData = ctx.getImageData(0, 0, w, h);
       const data = imageData.data;
-
       for (let i = 0; i < data.length; i += 4) {
-        // Greyscale (luminosity method)
         const grey = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-
-        // Contrast stretch: push towards black or white
-        const contrast = 1.6; // factor > 1 increases contrast
+        const contrast = 1.2; 
         const adjusted = Math.min(255, Math.max(0, (grey - 128) * contrast + 128));
-
         data[i] = adjusted;
         data[i + 1] = adjusted;
         data[i + 2] = adjusted;
-        // alpha unchanged
       }
-
       ctx.putImageData(imageData, 0, 0);
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error("Canvas toBlob failed"));
-        },
-        "image/png"
-      );
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Blob failed")), "image/jpeg", 0.9);
     };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Image load failed"));
-    };
-
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
     img.src = url;
   });
+}
+
+function cleanOcrText(text: string): string {
+  // Fix common OCR confusions for PAN numbers
+  return text
+    // Remove extra spaces within words
+    .replace(/\s+/g, " ")
+    .toUpperCase();
 }
 
 export async function runPanOcr(
@@ -98,29 +85,24 @@ export async function runPanOcr(
     corePath: `${base}/tesseract/tesseract-core-lstm.wasm.js`,
     langPath: `${base}/tesseract`,
     logger: (m: { status: string; progress?: number }) => {
-      console.log("[PAN OCR]", m.status, m.progress);
       if (m.status === "recognizing text" && onProgress) {
         onProgress(Math.round((m.progress ?? 0) * 100));
       }
     },
   });
 
+  // SPARSE_TEXT works well for cards to pick up blocks of text scattered around
   await worker.setParameters({
-    tessedit_pageseg_mode: PSM.AUTO,
+    tessedit_pageseg_mode: PSM.SPARSE_TEXT, 
     preserve_interword_spaces: "1",
   });
 
   let text = "";
   try {
-    // Preprocess: greyscale + contrast boost for better OCR on compressed images
     let input: File | Blob = file;
     if (file.type !== "application/pdf") {
-      try {
-        input = await preprocessImage(file);
-        console.log("[PAN OCR] Preprocessing done");
-      } catch (e) {
-        console.warn("[PAN OCR] Preprocessing failed, using raw file:", e);
-      }
+      try { input = await preprocessImage(file); } 
+      catch (e) { console.warn("[PAN OCR] Preprocessing failed", e); }
     }
 
     const { data } = await worker.recognize(input);
@@ -130,42 +112,65 @@ export async function runPanOcr(
     await worker.terminate();
   }
 
-  const lines = text.split("\n").map((l: string) => l.trim()).filter(Boolean);
   const result: PanOcrResult = {};
+  
+  // Clean text and look for PAN
+  const cleanedText = cleanOcrText(text);
+  
+  // Look for PAN: 5 letters, 4 numbers, 1 letter. 
+  // OCR might read 0 as O, 1 as I, 8 as B, 5 as S, etc. Let's use a slightly relaxed regex then fix it.
+  // We'll allow numbers in the first 5 if they look like letters (0/1/5/8) and letters in the numbers (O/I/S/B/Z)
+  const panRegex = /\b([A-Z0158]{5}[0-9OISBZ]{4}[A-Z0158])\b/;
+  const panMatch = cleanedText.match(panRegex);
+  
+  if (panMatch) {
+    let rawPan = panMatch[1];
+    // Fix characters based on position
+    rawPan = rawPan.substring(0, 5).replace(/0/g, 'O').replace(/1/g, 'I').replace(/8/g, 'B').replace(/5/g, 'S') +
+             rawPan.substring(5, 9).replace(/O/g, '0').replace(/I/g, '1').replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2') +
+             rawPan.substring(9, 10).replace(/0/g, 'O').replace(/1/g, 'I').replace(/8/g, 'B').replace(/5/g, 'S');
+    result.pan_number = rawPan;
+  }
 
-  // PAN number: 5 letters + 4 digits + 1 letter (allow 0/O confusion)
-  const panMatch = text.replace(/0/g, "O").match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/);
-  if (panMatch) result.pan_number = panMatch[1];
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
 
   // Date: DD/MM/YYYY or DD-MM-YYYY
-  const dobMatch = text.match(/\b(\d{2}[\/\-]\d{2}[\/\-]\d{4})\b/);
+  // OCR might add spaces or weird chars: \d{2} [/-.,] \d{2} [/-.,] \d{4}
+  const dateRegex = /\b(\d{2})[\s\/\-\.,]+(\d{2})[\s\/\-\.,]+(\d{4})\b/;
+  const dobMatch = text.match(dateRegex);
   if (dobMatch) {
-    const iso = toDobIso(dobMatch[1]);
+    const iso = toDobIso(`${dobMatch[1]}/${dobMatch[2]}/${dobMatch[3]}`);
     if (iso) result.date_of_birth = iso;
   }
 
-  // Name extraction
   const knownLabels = new Set([
     "INCOME TAX DEPARTMENT", "GOVT OF INDIA", "GOVERNMENT OF INDIA",
     "PERMANENT ACCOUNT NUMBER", "INCOME TAX", "DATE OF BIRTH",
-    "NAME", "FATHERS NAME", "FATHER S NAME",
+    "NAME", "FATHERS NAME", "FATHER S NAME", "FATHER'S NAME", "FATHERS", "SIGNATURE", "TAX"
   ]);
 
-  const nameLineIdx = lines.findIndex((l: string) => /^name$/i.test(l));
+  const nameLineIdx = lines.findIndex(l => /^name[\s:]*$/i.test(l.replace(/[^a-z]/ig, '')));
   if (nameLineIdx !== -1 && nameLineIdx + 1 < lines.length) {
     result.full_name = lines[nameLineIdx + 1];
   } else {
-    const candidates = lines.filter((l: string) => {
+    // Try to find the first line that looks like a name (all caps, multiple words, no numbers)
+    const candidates = lines.filter((l) => {
       const upper = l.toUpperCase();
-      if (upper.length < 4) return false;
-      if (knownLabels.has(upper)) return false;
-      if (/[0-9]{4}/.test(l)) return false;
-      return /^[A-Z\s\.]+$/.test(l);
+      if (upper.length < 5) return false;
+      
+      // Check if it's a known label or too similar
+      for (const label of knownLabels) {
+        if (upper.includes(label)) return false;
+      }
+      
+      if (/[0-9]/.test(l)) return false; // Names usually don't have numbers
+      if ((l.match(/[A-Z]/g) || []).length < 4) return false; // Needs some uppercase letters
+      return /^[A-Z\s\.]+$/i.test(l);
     });
+    
     if (candidates.length) {
-      result.full_name = candidates.reduce((a: string, b: string) =>
-        a.length >= b.length ? a : b
-      );
+      // Choose the longest one as it's typically the full name
+      result.full_name = candidates.reduce((a, b) => a.length >= b.length ? a : b);
     }
   }
 
