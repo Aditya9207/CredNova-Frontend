@@ -378,7 +378,18 @@ export default function CreditAIApplyPage() {
 
       if (Object.keys(updates).length > 0) {
         setFormData((prev) => ({ ...prev, ...updates }));
-        toast.info("Fields auto-filled from PAN card — please verify.");
+        
+        const filled: string[] = [];
+        if (updates.pan_number) filled.push("PAN");
+        if (updates.date_of_birth) filled.push("DOB");
+        if (updates.full_name) filled.push("Name");
+        
+        if (updates.pan_number) {
+          toast.info(`Auto-filled: ${filled.join(", ")}. Please verify.`);
+        } else {
+          toast.warning(`Read ${filled.join(", ")}, but could not find PAN number. Please type it manually.`);
+        }
+        
         setOcrDone(true);
       } else {
         toast.warning("Could not read PAN card clearly. Please fill fields manually.");

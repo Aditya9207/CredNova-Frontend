@@ -106,6 +106,12 @@ export async function runPanOcr(
       }
       if (/[0-9]/.test(l)) return false; 
       if ((l.match(/[A-Z]/g) || []).length < 4) return false; 
+      
+      // A name usually has at least two words (First Last) with no weird symbols
+      const words = l.split(/\s+/);
+      if (words.length < 2) return false;
+      if (words.some(w => w.length < 2)) return false;
+
       return /^[A-Z\s\.]+$/i.test(l);
     });
     
