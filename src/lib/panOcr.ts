@@ -11,7 +11,6 @@ export interface PanOcrResult {
 }
 
 function toDobIso(raw: string): string | undefined {
-  // Replace common OCR errors in dates like . or , instead of / or -
   const cleaned = raw.replace(/[\.,\s]/g, "/");
   const m = cleaned.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
   if (!m) return undefined;
@@ -22,51 +21,8 @@ function toDobIso(raw: string): string | undefined {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-async function preprocessImage(file: File): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      
-      // Scale image to a reasonable size for OCR (not too big, not too small)
-      // Tesseract works best when text x-height is ~20px
-      const scale = Math.max(1, 1500 / img.width);
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d")!;
-
-      ctx.drawImage(img, 0, 0, w, h);
-
-      // Mild contrast boost + grayscale
-      const imageData = ctx.getImageData(0, 0, w, h);
-      const data = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const grey = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-        const contrast = 1.2; 
-        const adjusted = Math.min(255, Math.max(0, (grey - 128) * contrast + 128));
-        data[i] = adjusted;
-        data[i + 1] = adjusted;
-        data[i + 2] = adjusted;
-      }
-      ctx.putImageData(imageData, 0, 0);
-
-      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Blob failed")), "image/jpeg", 0.9);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
-    img.src = url;
-  });
-}
-
 function cleanOcrText(text: string): string {
-  // Fix common OCR confusions for PAN numbers
   return text
-    // Remove extra spaces within words
     .replace(/\s+/g, " ")
     .toUpperCase();
 }
@@ -76,7 +32,6 @@ export async function runPanOcr(
   onProgress?: (pct: number) => void
 ): Promise<PanOcrResult> {
   const { createWorker, PSM } = await import("tesseract.js");
-
   const base = window.location.origin;
 
   const worker = await createWorker("eng", 1, {
@@ -91,21 +46,18 @@ export async function runPanOcr(
     },
   });
 
-  // SPARSE_TEXT works well for cards to pick up blocks of text scattered around
+  // Reverting to AUTO (3) which is generally best for documents.
+  // SPARSE_TEXT was finding too much noise.
   await worker.setParameters({
-    tessedit_pageseg_mode: PSM.SPARSE_TEXT, 
+    tessedit_pageseg_mode: PSM.AUTO, 
     preserve_interword_spaces: "1",
   });
 
   let text = "";
   try {
-    let input: File | Blob = file;
-    if (file.type !== "application/pdf") {
-      try { input = await preprocessImage(file); } 
-      catch (e) { console.warn("[PAN OCR] Preprocessing failed", e); }
-    }
-
-    const { data } = await worker.recognize(input);
+    // Pass raw file without canvas preprocessing. 
+    // Tesseract's internal binarization handles contrast better.
+    const { data } = await worker.recognize(file);
     text = data.text ?? "";
     console.log("[PAN OCR] Raw text:", text);
   } finally {
@@ -113,19 +65,14 @@ export async function runPanOcr(
   }
 
   const result: PanOcrResult = {};
-  
-  // Clean text and look for PAN
   const cleanedText = cleanOcrText(text);
   
-  // Look for PAN: 5 letters, 4 numbers, 1 letter. 
-  // OCR might read 0 as O, 1 as I, 8 as B, 5 as S, etc. Let's use a slightly relaxed regex then fix it.
-  // We'll allow numbers in the first 5 if they look like letters (0/1/5/8) and letters in the numbers (O/I/S/B/Z)
+  // PAN Regex
   const panRegex = /\b([A-Z0158]{5}[0-9OISBZ]{4}[A-Z0158])\b/;
   const panMatch = cleanedText.match(panRegex);
   
   if (panMatch) {
     let rawPan = panMatch[1];
-    // Fix characters based on position
     rawPan = rawPan.substring(0, 5).replace(/0/g, 'O').replace(/1/g, 'I').replace(/8/g, 'B').replace(/5/g, 'S') +
              rawPan.substring(5, 9).replace(/O/g, '0').replace(/I/g, '1').replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2') +
              rawPan.substring(9, 10).replace(/0/g, 'O').replace(/1/g, 'I').replace(/8/g, 'B').replace(/5/g, 'S');
@@ -134,8 +81,6 @@ export async function runPanOcr(
 
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
 
-  // Date: DD/MM/YYYY or DD-MM-YYYY
-  // OCR might add spaces or weird chars: \d{2} [/-.,] \d{2} [/-.,] \d{4}
   const dateRegex = /\b(\d{2})[\s\/\-\.,]+(\d{2})[\s\/\-\.,]+(\d{4})\b/;
   const dobMatch = text.match(dateRegex);
   if (dobMatch) {
@@ -153,23 +98,18 @@ export async function runPanOcr(
   if (nameLineIdx !== -1 && nameLineIdx + 1 < lines.length) {
     result.full_name = lines[nameLineIdx + 1];
   } else {
-    // Try to find the first line that looks like a name (all caps, multiple words, no numbers)
     const candidates = lines.filter((l) => {
       const upper = l.toUpperCase();
       if (upper.length < 5) return false;
-      
-      // Check if it's a known label or too similar
       for (const label of knownLabels) {
         if (upper.includes(label)) return false;
       }
-      
-      if (/[0-9]/.test(l)) return false; // Names usually don't have numbers
-      if ((l.match(/[A-Z]/g) || []).length < 4) return false; // Needs some uppercase letters
+      if (/[0-9]/.test(l)) return false; 
+      if ((l.match(/[A-Z]/g) || []).length < 4) return false; 
       return /^[A-Z\s\.]+$/i.test(l);
     });
     
     if (candidates.length) {
-      // Choose the longest one as it's typically the full name
       result.full_name = candidates.reduce((a, b) => a.length >= b.length ? a : b);
     }
   }
