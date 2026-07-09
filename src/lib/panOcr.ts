@@ -1,10 +1,8 @@
 /**
  * panOcr.ts
  * Browser-side OCR for Indian PAN cards using Tesseract.js v7 (lazy-loaded).
- * Extracts: pan_number, date_of_birth, full_name.
- *
- * worker.min.js is served from /tesseract/worker.min.js (public folder).
- * Language data and WASM core are loaded from jsDelivr CDN.
+ * All heavy assets (worker, WASM core) served locally from /tesseract/.
+ * Only the language data (eng.traineddata) is fetched from CDN.
  */
 
 export interface PanOcrResult {
@@ -13,7 +11,6 @@ export interface PanOcrResult {
   full_name?: string;
 }
 
-/** Converts dd/mm/yyyy or dd-mm-yyyy to YYYY-MM-DD */
 function toDobIso(raw: string): string | undefined {
   const m = raw.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
   if (!m) return undefined;
@@ -30,14 +27,13 @@ export async function runPanOcr(
 ): Promise<PanOcrResult> {
   const { createWorker, PSM } = await import("tesseract.js");
 
-  // worker.min.js is in public/tesseract/ -> served at /tesseract/worker.min.js
-  const workerPath = `${window.location.origin}/tesseract/worker.min.js`;
+  const base = window.location.origin;
 
   const worker = await createWorker("eng", 1, {
-    workerPath,
+    workerPath: `${base}/tesseract/worker.min.js`,
     workerBlobURL: false,
+    corePath: `${base}/tesseract/tesseract-core-lstm.wasm.js`,
     langPath: "https://cdn.jsdelivr.net/npm/tesseract.js-data@4.0.0",
-    corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.0/tesseract-core-lstm.wasm.js",
     logger: (m: { status: string; progress?: number }) => {
       console.log("[PAN OCR]", m.status, m.progress);
       if (m.status === "recognizing text" && onProgress) {
@@ -60,25 +56,18 @@ export async function runPanOcr(
     await worker.terminate();
   }
 
-  const lines = text
-    .split("\n")
-    .map((l: string) => l.trim())
-    .filter(Boolean);
-
+  const lines = text.split("\n").map((l: string) => l.trim()).filter(Boolean);
   const result: PanOcrResult = {};
 
-  // PAN number: 5 uppercase letters + 4 digits + 1 uppercase letter
   const panMatch = text.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/);
   if (panMatch) result.pan_number = panMatch[1];
 
-  // Date of birth: DD/MM/YYYY or DD-MM-YYYY
   const dobMatch = text.match(/\b(\d{2}[\/\-]\d{2}[\/\-]\d{4})\b/);
   if (dobMatch) {
     const iso = toDobIso(dobMatch[1]);
     if (iso) result.date_of_birth = iso;
   }
 
-  // Name: line after "Name" label, or longest all-caps line
   const knownLabels = new Set([
     "INCOME TAX DEPARTMENT", "GOVT OF INDIA", "GOVERNMENT OF INDIA",
     "PERMANENT ACCOUNT NUMBER", "INCOME TAX", "DATE OF BIRTH",
