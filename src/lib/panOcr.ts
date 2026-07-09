@@ -1,8 +1,7 @@
 /**
  * panOcr.ts
  * Browser-side OCR for Indian PAN cards using Tesseract.js v7 (lazy-loaded).
- * All heavy assets (worker, WASM core) served locally from /tesseract/.
- * Only the language data (eng.traineddata) is fetched from CDN.
+ * All assets served locally from /tesseract/ - no external CDN needed.
  */
 
 export interface PanOcrResult {
@@ -33,7 +32,8 @@ export async function runPanOcr(
     workerPath: `${base}/tesseract/worker.min.js`,
     workerBlobURL: false,
     corePath: `${base}/tesseract/tesseract-core-lstm.wasm.js`,
-    langPath: "https://cdn.jsdelivr.net/npm/tesseract.js-data@4.0.0",
+    // langPath: folder that contains eng.traineddata.gz
+    langPath: `${base}/tesseract`,
     logger: (m: { status: string; progress?: number }) => {
       console.log("[PAN OCR]", m.status, m.progress);
       if (m.status === "recognizing text" && onProgress) {
