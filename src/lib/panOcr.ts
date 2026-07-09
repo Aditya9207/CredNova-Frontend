@@ -1,8 +1,7 @@
 /**
  * panOcr.ts
- * Browser-side OCR for Indian PAN cards using Tesseract.js (lazy-loaded).
+ * Browser-side OCR for Indian PAN cards using Tesseract.js v7 (lazy-loaded).
  * Extracts: pan_number, date_of_birth, full_name.
- * Address is NOT on Indian PAN cards - skipped intentionally.
  */
 
 export interface PanOcrResult {
@@ -11,31 +10,35 @@ export interface PanOcrResult {
   full_name?: string;
 }
 
-/**
- * Converts a dd/mm/yyyy or dd-mm-yyyy date string to YYYY-MM-DD for <input type="date">.
- */
+/** Converts dd/mm/yyyy or dd-mm-yyyy to YYYY-MM-DD */
 function toDobIso(raw: string): string | undefined {
   const m = raw.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
   if (!m) return undefined;
   const [, dd, mm, yyyy] = m;
   const d = Number(dd), mo = Number(mm), y = Number(yyyy);
-  if (d < 1 || d > 31 || mo < 1 || mo > 12 || y < 1900 || y > new Date().getFullYear()) return undefined;
+  if (d < 1 || d > 31 || mo < 1 || mo > 12 || y < 1900 || y > new Date().getFullYear())
+    return undefined;
   return `${yyyy}-${mm}-${dd}`;
 }
 
-/**
- * Run Tesseract OCR on a PAN card image file and return extracted fields.
- * @param file       The image File (JPG, PNG, or WEBP) of the PAN card.
- * @param onProgress Optional progress callback (0-100).
- */
 export async function runPanOcr(
   file: File,
   onProgress?: (pct: number) => void
 ): Promise<PanOcrResult> {
-  const { createWorker, PSM } = await import("tesseract.js");
+  const Tesseract = await import("tesseract.js");
+  const { createWorker, PSM } = Tesseract;
+
+  // v7: createWorker(langs, oem, options)
+  // workerPath / corePath / langPath must be explicit CDN URLs in production
+  const CDN = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist";
+  const LANG_CDN = "https://cdn.jsdelivr.net/npm/tesseract.js-data@4.0.0/";
 
   const worker = await createWorker("eng", 1, {
+    workerPath: `${CDN}/worker.min.js`,
+    langPath: LANG_CDN,
+    corePath: `${CDN}/tesseract-core-lstm.wasm.js`,
     logger: (m: { status: string; progress?: number }) => {
+      console.log("[PAN OCR]", m.status, m.progress);
       if (m.status === "recognizing text" && onProgress) {
         onProgress(Math.round((m.progress ?? 0) * 100));
       }
@@ -47,10 +50,15 @@ export async function runPanOcr(
     preserve_interword_spaces: "1",
   });
 
-  const { data } = await worker.recognize(file);
-  await worker.terminate();
+  let text = "";
+  try {
+    const { data } = await worker.recognize(file);
+    text = data.text ?? "";
+    console.log("[PAN OCR] Raw text:", text);
+  } finally {
+    await worker.terminate();
+  }
 
-  const text = data.text ?? "";
   const lines = text
     .split("\n")
     .map((l: string) => l.trim())
@@ -58,7 +66,7 @@ export async function runPanOcr(
 
   const result: PanOcrResult = {};
 
-  // PAN number: AAAAA9999A
+  // PAN number: 5 uppercase letters + 4 digits + 1 uppercase letter
   const panMatch = text.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/);
   if (panMatch) result.pan_number = panMatch[1];
 
@@ -69,7 +77,7 @@ export async function runPanOcr(
     if (iso) result.date_of_birth = iso;
   }
 
-  // Name: line after "Name" label, or longest all-caps line
+  // Name extraction
   const knownLabels = new Set([
     "INCOME TAX DEPARTMENT", "GOVT OF INDIA", "GOVERNMENT OF INDIA",
     "PERMANENT ACCOUNT NUMBER", "INCOME TAX", "DATE OF BIRTH",
@@ -88,7 +96,9 @@ export async function runPanOcr(
       return /^[A-Z\s\.]+$/.test(l);
     });
     if (candidates.length) {
-      result.full_name = candidates.reduce((a: string, b: string) => (a.length >= b.length ? a : b));
+      result.full_name = candidates.reduce((a: string, b: string) =>
+        a.length >= b.length ? a : b
+      );
     }
   }
 
@@ -100,5 +110,6 @@ export async function runPanOcr(
     if (result.full_name.length < 2) delete result.full_name;
   }
 
+  console.log("[PAN OCR] Result:", result);
   return result;
 }
