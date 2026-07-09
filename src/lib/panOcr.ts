@@ -2,7 +2,7 @@
  * panOcr.ts
  * Browser-side OCR for Indian PAN cards using Tesseract.js (lazy-loaded).
  * Extracts: pan_number, date_of_birth, full_name.
- * Address is NOT on Indian PAN cards — skipped intentionally.
+ * Address is NOT on Indian PAN cards - skipped intentionally.
  */
 
 export interface PanOcrResult {
@@ -32,7 +32,7 @@ export async function runPanOcr(
   file: File,
   onProgress?: (pct: number) => void
 ): Promise<PanOcrResult> {
-  const { createWorker } = await import("tesseract.js");
+  const { createWorker, PSM } = await import("tesseract.js");
 
   const worker = await createWorker("eng", 1, {
     logger: (m: { status: string; progress?: number }) => {
@@ -43,7 +43,7 @@ export async function runPanOcr(
   });
 
   await worker.setParameters({
-    tessedit_pageseg_mode: "6",
+    tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
     preserve_interword_spaces: "1",
   });
 
