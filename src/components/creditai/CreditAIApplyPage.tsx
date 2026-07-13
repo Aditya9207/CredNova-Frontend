@@ -20,7 +20,6 @@ import {
   PhoneOutlined,
   CalendarOutlined,
   EnvironmentOutlined,
-  CameraOutlined,
   InfoCircleOutlined,
   DeleteOutlined,
   SettingOutlined,
@@ -31,6 +30,7 @@ import {
   AreaChartOutlined,
   FormOutlined,
   FolderOpenOutlined,
+  CameraOutlined,
   SyncOutlined,
   CheckCircleFilled,
 } from "@ant-design/icons";
@@ -385,9 +385,9 @@ export default function CreditAIApplyPage() {
         if (updates.full_name) filled.push("Name");
         
         if (updates.pan_number) {
-          toast.info(`Auto-filled: ${filled.join(", ")}. Please verify.`);
+          toast.success(`Auto-filled: ${filled.join(", ")}. Please verify.`);
         } else {
-          toast.warning(`Read ${filled.join(", ")}, but could not find PAN number. Please type it manually.`);
+          toast.warning(`Read ${filled.join(", ")}, but could not find PAN number.`);
         }
         
         setOcrDone(true);
@@ -665,7 +665,7 @@ export default function CreditAIApplyPage() {
                     style={{ borderColor: "rgba(180, 190, 210, 0.4)", background: "rgba(255,255,255,0.65)" }}
                   >
                     <div className="flex items-start gap-3 mb-4">
-                      <CameraOutlined className="text-xl shrink-0 mt-0.5" style={{ color: "var(--wirely-accent)" }} />
+                      <IdcardOutlined className="text-xl shrink-0 mt-0.5" style={{ color: "var(--wirely-accent)" }} />
                       <div>
                         <h3 className="text-[15px] font-semibold text-[#1a2236]">PAN card (optional)</h3>
                         <p className="text-[13px] mt-1 leading-relaxed" style={{ color: "var(--wirely-text-muted)" }}>
