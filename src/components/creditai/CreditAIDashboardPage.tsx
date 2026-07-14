@@ -2,21 +2,22 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useClerk, useUser, UserButton } from "@clerk/clerk-react";
 import {
-  BellOutlined,
-  HomeOutlined,
-  FormOutlined,
-  SafetyCertificateOutlined,
-  FolderOpenOutlined,
-  SettingOutlined,
-  RightOutlined,
-  StarOutlined,
-  CarOutlined,
-  DashboardOutlined,
-  BulbOutlined,
-  AreaChartOutlined,
-  LogoutOutlined,
-  MenuOutlined,
-} from "@ant-design/icons";
+  Bell,
+  Home,
+  FileText,
+  ShieldCheck,
+  FolderOpen,
+  Settings,
+  ChevronRight,
+  Star,
+  Car,
+  LayoutDashboard,
+  Lightbulb,
+  AreaChart,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 import {
   fetchCreditApplication,
   fetchCreditInsights,
@@ -299,53 +300,55 @@ export default function CreditAIDashboardPage() {
       )}
 
       {/* Sidebar — desktop: fixed left column | mobile: slide-in drawer */}
-      <aside className={`wirely-sidebar${mobileNavOpen ? " wirely-sidebar--open" : ""}${isCollapsed ? " wirely-sidebar--collapsed" : ""}`}>
+      <aside className={`wirely-sidebar${mobileNavOpen ? " wirely-sidebar--mobile-open" : ""}${isCollapsed ? " wirely-sidebar--collapsed" : ""}`}>
         <div className="wirely-sidebar__brand">
+          {/* Hamburger close toggle — mobile only */}
           <button
             type="button"
-            className="wirely-hamburger"
+            className="wirely-hamburger md:hidden"
             onClick={() => setMobileNavOpen(false)}
             aria-label="Close menu"
           >
-            ✕
+            <X size={20} />
           </button>
           <CredNovaMark className="wirely-sidebar__logo" />
           <span className="wirely-sidebar__title">CredNova</span>
           <button 
-            className="wirely-sidebar__toggle" 
+            type="button"
+            className="wirely-sidebar__toggle hidden md:flex" 
             onClick={() => setIsCollapsed(!isCollapsed)}
             aria-label="Toggle sidebar"
           >
-            <MenuOutlined />
+            <Menu size={16} />
           </button>
         </div>
         <nav className="wirely-sidebar__nav">
           <button type="button" className={`wirely-sidebar__link ${activeSection === "analysis" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("analysis"); setMobileNavOpen(false); }}>
-            <AreaChartOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <AreaChart size={18} style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">Analysis</span>
           </button>
           
           <button type="button" className={`wirely-sidebar__link ${activeSection === "insights" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("insights"); setMobileNavOpen(false); }}>
-            <BulbOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <Lightbulb size={18} style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">Insights</span>
           </button>
           
           <button type="button" className={`wirely-sidebar__link ${activeSection === "portfolio" ? "wirely-sidebar__link--active" : ""}`} onClick={() => { setActiveSection("portfolio"); setMobileNavOpen(false); }}>
-            <DashboardOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <LayoutDashboard size={18} style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">My portfolio</span>
           </button>
           
           <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/credit-ai"); }}>
-            <FormOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <FileText size={18} style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">New application</span>
           </button>
           <button type="button" className="wirely-sidebar__link" onClick={() => { setMobileNavOpen(false); navigate("/"); }}>
-            <HomeOutlined style={{ marginRight: isCollapsed ? 0 : 8 }} />
+            <Home size={18} style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">Home</span>
           </button>
         </nav>
         
-        <div className="wirely-sidebar__profile-section" style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid rgba(180, 190, 210, 0.2)", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="wirely-sidebar__profile-section" style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.05)", display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px" }}>
             <UserButton 
               appearance={{ 
@@ -355,9 +358,9 @@ export default function CreditAIDashboardPage() {
                 } 
               }} 
             />
-            <div className="wirely-profile__text" style={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--wirely-text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</div>
-              <div style={{ fontSize: 12, color: "var(--wirely-text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{email}</div>
+            <div className="wirely-profile__text" style={{ display: isCollapsed ? "none" : "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</div>
+              <div style={{ fontSize: 12, color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{email}</div>
             </div>
           </div>
           <button 
@@ -365,26 +368,14 @@ export default function CreditAIDashboardPage() {
             className="wirely-sidebar__link wirely-sidebar__link--signout" 
             aria-label="Logout"
             onClick={() => void signOut().then(() => navigate("/sign-in"))}
-            style={{ 
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              justifyContent: "center",
-              padding: "10px",
-              borderRadius: "24px",
-              border: "1px solid rgba(180, 190, 210, 0.3)",
-              background: "rgba(255, 255, 255, 0.5)",
-              color: "#ef4444",
-              fontWeight: 500
-            }}
           >
-            <LogoutOutlined style={{ fontSize: 16 }} />
+            <LogOut size={18} style={{ marginRight: isCollapsed ? 0 : 8 }} />
             <span className="wirely-sidebar__link-text">Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* Mobile top bar */}
+      {/* Mobile top bar with hamburger toggle */}
       <div className="wirely-mobile-topbar">
         <button
           type="button"
@@ -392,11 +383,23 @@ export default function CreditAIDashboardPage() {
           onClick={() => setMobileNavOpen(true)}
           aria-label="Open menu"
         >
-          <span /><span /><span />
+          <Menu size={24} />
         </button>
         <div className="wirely-mobile-topbar__brand">
           <CredNovaMark className="wirely-sidebar__logo" />
           <span className="wirely-sidebar__title">CredNova</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <button type="button" className="text-gray-600 p-1" aria-label="Notifications" style={{ background: "transparent", border: "none", cursor: "pointer" }}>
+            <Bell size={20} />
+          </button>
+          <UserButton 
+            appearance={{ 
+              elements: { 
+                userButtonAvatarBox: { width: 32, height: 32 }
+              } 
+            }} 
+          />
         </div>
       </div>
 
@@ -404,7 +407,7 @@ export default function CreditAIDashboardPage() {
         <header className="wirely-topbar">
           <div className="wirely-hero">
             <div className="wirely-breadcrumb">
-              Dashboard <span>/</span> {crumb}
+              <span className="text-[#6366f1] font-semibold">Dashboard</span> <span>&gt;</span> {crumb}
             </div>
             <h1 className="wirely-page-title">{sectionTitle}</h1>
             <div className="wirely-hero__value">{credit_score.toLocaleString("en-IN")}</div>
@@ -434,7 +437,7 @@ export default function CreditAIDashboardPage() {
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                   style={{ width: 34, height: 34, background: "transparent", borderColor: "rgba(180, 190, 210, 0.3)" }}
                 >
-                  <BellOutlined style={{ fontSize: 16, color: "#6b7a90" }} />
+                  <Bell size={16} className="text-[#6b7a90]" />
                   <span className="wirely-bell-badge" style={{ background: "#14b8a6", top: -2, right: -2, width: 8, height: 8 }} />
                 </button>
                 
@@ -475,7 +478,7 @@ export default function CreditAIDashboardPage() {
                   cursor: "pointer"
                 }}
               >
-                <LogoutOutlined style={{ fontSize: 16 }} />
+                <LogOut size={16} />
                 Logout
               </button>
             </div>
@@ -591,13 +594,13 @@ export default function CreditAIDashboardPage() {
             {showAssets ? (
               <div className="wirely-card" style={{ marginTop: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                  <FolderOpenOutlined style={{ color: "var(--wirely-accent)", fontSize: 20 }} />
+                  <FolderOpen size={20} className="text-[#5B5FEF]" />
                   <h2 className="wirely-card__title" style={{ margin: 0 }}>
                     Collateral
                   </h2>
-                  <span className="wirely-tag">
-                    <SafetyCertificateOutlined style={{ fontSize: 11 }} />
-                    {data.asset_verification?.status === "pending_visit" ? "Verification pending" : "Recorded"}
+                  <span className="wirely-tag" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <ShieldCheck size={12} />
+                    <span>{data.asset_verification?.status === "pending_visit" ? "Verification pending" : "Recorded"}</span>
                   </span>
                 </div>
                 <table className="wirely-table">
@@ -611,9 +614,9 @@ export default function CreditAIDashboardPage() {
                   <tbody>
                     {data.formSummary?.has_home === "1" ? (
                       <tr>
-                        <td>
-                          <HomeOutlined style={{ marginRight: 8, color: "var(--wirely-accent)" }} />
-                          Residential property
+                        <td style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <Home size={16} className="text-[#5B5FEF]" />
+                          <span>Residential property</span>
                         </td>
                         <td style={{ color: "var(--wirely-text-muted)" }}>Declared</td>
                         <td style={{ textAlign: "right" }}>Field visit</td>
@@ -621,18 +624,18 @@ export default function CreditAIDashboardPage() {
                     ) : null}
                     {data.formSummary?.has_gold === "1" ? (
                       <tr>
-                        <td>
-                          <StarOutlined style={{ marginRight: 8, color: "var(--wirely-accent)" }} />
-                          Gold holdings
+                        <td style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <Star size={16} className="text-[#5B5FEF]" />
+                          <span>Gold holdings</span>
                         </td>
                         <td style={{ color: "var(--wirely-text-muted)" }}>Declared</td>
                         <td style={{ textAlign: "right" }}>Field visit</td>
                       </tr>
                     ) : null}
                     <tr>
-                      <td>
-                        <CarOutlined style={{ marginRight: 8, color: "var(--wirely-text-muted)" }} />
-                        Other
+                      <td style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <Car size={16} className="text-gray-400" />
+                        <span>Other</span>
                       </td>
                       <td style={{ color: "var(--wirely-text-muted)" }}>—</td>
                       <td style={{ textAlign: "right" }}>As applicable</td>

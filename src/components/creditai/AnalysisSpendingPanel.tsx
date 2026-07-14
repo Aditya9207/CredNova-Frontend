@@ -1,4 +1,4 @@
-import { BarChartOutlined, PieChartOutlined } from "@ant-design/icons";
+import { BarChart3, PieChart as PieChartIcon } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -39,7 +39,7 @@ export default function AnalysisSpendingPanel({ insights, loading, error }: Prop
       <div className="wirely-card" style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
         <div style={{ padding: "16px 20px 0" }}>
           <h2 className="wirely-card__title" style={{ marginBottom: 0 }}>
-            <BarChartOutlined style={{ marginRight: 8, color: "var(--wirely-accent)" }} />
+            <BarChart3 size={20} className="inline mr-2 text-[#5B5FEF]" />
             Spending analysis
           </h2>
         </div>
@@ -52,7 +52,7 @@ export default function AnalysisSpendingPanel({ insights, loading, error }: Prop
     return (
       <div className="wirely-card" style={{ marginTop: 20 }}>
         <h2 className="wirely-card__title" style={{ marginBottom: 8 }}>
-          <BarChartOutlined style={{ marginRight: 8, color: "var(--wirely-accent)" }} />
+          <BarChart3 size={20} className="inline mr-2 text-[#5B5FEF]" />
           Spending analysis
         </h2>
         <p className="wirely-contact__meta" style={{ color: "var(--wirely-text-muted)" }}>
@@ -76,7 +76,7 @@ export default function AnalysisSpendingPanel({ insights, loading, error }: Prop
     <div style={{ marginTop: 24 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <PieChartOutlined style={{ color: "var(--wirely-accent)", fontSize: 22 }} />
+          <PieChartIcon size={22} className="text-[#5B5FEF]" />
           <div>
             <h2 className="wirely-card__title" style={{ margin: 0 }}>
               Spending by category

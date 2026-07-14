@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LeftOutlined, RightOutlined, RocketOutlined } from "@ant-design/icons";
+import { ChevronLeft, ChevronRight, Rocket } from "lucide-react";
 
 type Props = {
   tips: string[];
@@ -49,7 +49,7 @@ export default function CreditScoreTipFlashCards({ tips, llmUsed }: Props) {
     <div className="crednova-flash">
       <div className="crednova-flash__header">
         <div className="crednova-flash__title-row">
-          <RocketOutlined className="crednova-flash__rocket" aria-hidden />
+          <Rocket className="crednova-flash__rocket text-[#5B5FEF]" size={20} aria-hidden />
           <div>
             <h3 className="crednova-flash__title">Boost your credit score</h3>
             <p className="crednova-flash__subtitle">
@@ -67,7 +67,7 @@ export default function CreditScoreTipFlashCards({ tips, llmUsed }: Props) {
             disabled={index <= 0}
             onClick={() => scrollTo(index - 1)}
           >
-            <LeftOutlined />
+            <ChevronLeft size={16} />
           </button>
           <span className="crednova-flash__counter">
             {index + 1} / {n}
@@ -79,7 +79,7 @@ export default function CreditScoreTipFlashCards({ tips, llmUsed }: Props) {
             disabled={index >= n - 1}
             onClick={() => scrollTo(index + 1)}
           >
-            <RightOutlined />
+            <ChevronRight size={16} />
           </button>
         </div>
       </div>

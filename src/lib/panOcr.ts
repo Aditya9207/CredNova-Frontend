@@ -4,6 +4,7 @@ export interface PanOcrResult {
   pan_number?: string;
   full_name?: string;
   date_of_birth?: string;
+  error?: string;
 }
 
 /**
@@ -19,8 +20,10 @@ export async function runPanOcr(file: File): Promise<PanOcrResult> {
   });
 
   if (!res.ok) {
-    throw new Error(`OCR failed: ${res.statusText}`);
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || `OCR backend failed: ${res.statusText} (${res.status})`);
   }
 
   return await res.json();
 }
+

@@ -1,4 +1,4 @@
-import { PieChartOutlined } from "@ant-design/icons";
+import { PieChart as PieChartIcon } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import type { CreditInsightsResponse } from "@/lib/creditApi";
 import CredNovaMaterialLoader from "./CredNovaMaterialLoader";
@@ -24,7 +24,7 @@ export default function SpendingInsightsSection({ insights, loading, error }: Pr
       <div className="wirely-card" style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
         <div style={{ padding: "16px 20px 0" }}>
           <h2 className="wirely-card__title" style={{ marginBottom: 0 }}>
-            <PieChartOutlined style={{ marginRight: 8, color: "var(--wirely-accent)" }} />
+            <PieChartIcon size={20} className="inline mr-2 text-[#5B5FEF]" />
             Spending & credit insights
           </h2>
         </div>
@@ -37,7 +37,7 @@ export default function SpendingInsightsSection({ insights, loading, error }: Pr
     return (
       <div className="wirely-card" style={{ marginTop: 20 }}>
         <h2 className="wirely-card__title" style={{ marginBottom: 8 }}>
-          <PieChartOutlined style={{ marginRight: 8, color: "var(--wirely-accent)" }} />
+          <PieChartIcon size={20} className="inline mr-2 text-[#5B5FEF]" />
           Spending & credit insights
         </h2>
         <p className="wirely-contact__meta" style={{ color: "var(--wirely-text-muted)" }}>
@@ -54,7 +54,7 @@ export default function SpendingInsightsSection({ insights, loading, error }: Pr
   return (
     <div className="wirely-card" style={{ marginTop: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-        <PieChartOutlined style={{ color: "var(--wirely-accent)", fontSize: 20 }} />
+        <PieChartIcon size={20} className="text-[#5B5FEF]" />
         <h2 className="wirely-card__title" style={{ margin: 0 }}>
           Spending & credit insights
         </h2>

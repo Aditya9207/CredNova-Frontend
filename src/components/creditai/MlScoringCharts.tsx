@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from "recharts";
-import { ThunderboltOutlined, FundOutlined } from "@ant-design/icons";
+import { Activity, Zap } from "lucide-react";
 
 const BAR_COLORS = ["#5B87B7", "#4CAFA0", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#ec4899"];
 
@@ -64,7 +64,7 @@ export default function MlScoringCharts({ modelPayload, modelOutput, statementMe
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <FundOutlined style={{ fontSize: 22, color: "var(--wirely-accent)" }} />
+          <Activity size={22} className="text-[#5B5FEF]" />
           <div>
             <h2 className="wirely-card__title" style={{ margin: 0, fontSize: 17 }}>
               ML scoring branch
@@ -133,12 +133,16 @@ export default function MlScoringCharts({ modelPayload, modelOutput, statementMe
             background: "rgba(91, 135, 183, 0.08)",
             fontSize: 13,
             color: "#334155",
+            display: "flex",
+            alignItems: "center"
           }}
         >
-          <ThunderboltOutlined style={{ marginRight: 8, color: "#5b87b7" }} />
-          Statement-derived signals:{" "}
-          <strong>{monthlyUpi.toFixed(1)}</strong> UPI-like txns / mo · cash ratio{" "}
-          <strong>{(cashRatio * 100).toFixed(1)}%</strong>
+          <Zap size={16} className="text-[#5b87b7] mr-2" />
+          <span>
+            Statement-derived signals:{" "}
+            <strong>{monthlyUpi.toFixed(1)}</strong> UPI-like txns / mo · cash ratio{" "}
+            <strong>{(cashRatio * 100).toFixed(1)}%</strong>
+          </span>
         </div>
       ) : null}
 

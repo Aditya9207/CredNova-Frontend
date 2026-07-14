@@ -198,18 +198,29 @@ const BankEmployeePage: FC = () => {
   }, [flow, customer]);
 
   const onRunPipeline = async () => {
-    if (!customer) return;
+    if (!customer) {
+      console.warn("[BankEmployee] Run pipeline triggered but no customer is selected.");
+      return;
+    }
+    console.info("[BankEmployee] Run pipeline triggered for customer:", customer.fullName);
     if (isBankCsvPipelineCustomer(customer)) {
+      console.info("[BankEmployee] Customer uses live CSV analysis path. Initializing results state...");
       setMlResult(null);
       setInsightsResult(null);
       setPipelineDoneCount(0);
       setFlow("pipeline");
       setPipelineLoading(true);
       try {
+        console.info("[BankEmployee] Downloading public mock bank statement CSV from:", BANK_CSV_PUBLIC_PATH);
         const resBlob = await fetch(BANK_CSV_PUBLIC_PATH);
-        if (!resBlob.ok) throw new Error("Could not load bank statement CSV from server.");
+        if (!resBlob.ok) {
+          throw new Error("Could not load bank statement CSV from server.");
+        }
         const blob = await resBlob.blob();
+        console.info("[BankEmployee] CSV downloaded successfully. Size:", blob.size, "bytes. Preparing file object...");
         const file = new File([blob], "bank-statement-ISAPD7498P.csv", { type: "text/csv" });
+        
+        console.info("[BankEmployee] Sending demo CSV data and meta details to backend API...");
         const res = await bankEmployeeAnalyzeCsv(
           {
             pan_number: customer.pan,
@@ -217,21 +228,28 @@ const BankEmployeePage: FC = () => {
           },
           file,
         );
+        console.info("[BankEmployee] Backend CSV analysis completed successfully. Application ID:", res.application_id);
+        
+        console.info("[BankEmployee] Fetching credit insights narrative and tips for Application ID:", res.application_id);
         const ins = await fetchCreditInsights(res.application_id);
+        console.info("[BankEmployee] Insights fetched successfully.");
+
         setMlResult(res);
         setInsightsResult(ins);
         setSanctionLakh(suggestedSanctionLakh(customer, period));
         setFlow("dashboard");
         toast.success("Analysis complete — data from your CSV ran through the CredNova ML + insights pipeline.");
       } catch (e) {
-        console.error(e);
+        console.error("[BankEmployee] Live CSV pipeline execution failed:", e);
         toast.error(e instanceof Error ? e.message : "ML pipeline failed. Is the backend running on VITE_API_URL?");
         setFlow("aggregation_review");
       } finally {
+        console.info("[BankEmployee] CSV pipeline loading complete.");
         setPipelineLoading(false);
       }
       return;
     }
+    console.info("[BankEmployee] Customer uses static mock pipeline path. Simulating steps...");
     setPipelineDoneCount(0);
     setFlow("pipeline");
   };
