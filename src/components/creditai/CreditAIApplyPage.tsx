@@ -1560,19 +1560,29 @@ export default function CreditAIApplyPage() {
                     <span className="font-medium text-[#475569]">~5 mins</span>
                   </div>
                 </div>
+
+                {/* Hover Expand Details Box */}
+                <div className="wirely-hover-expand-box text-left text-xs text-gray-600">
+                  <p className="font-semibold text-gray-800 mb-1.5">Score Impact Breakdown:</p>
+                  <ul className="space-y-1 text-[11px] text-gray-500">
+                    <li>• Identity OCR Check: <span className="text-emerald-600 font-medium">Passed</span></li>
+                    <li>• CIBIL Score History: <span className="text-indigo-600 font-medium">Verified</span></li>
+                    <li>• Cashflow & Rent Ratio: <span className="text-blue-600 font-medium">Active</span></li>
+                  </ul>
+                </div>
               </div>
             </div>
 
-            {/* Checklist Card */}
+            {/* Checklist Card with Floating Hover Popovers */}
             <div className="wirely-side-card">
               <h4 className="wirely-card-title mb-6">Application Timeline</h4>
               <div className="wirely-checklist">
                 {[
-                  { s: 1, label: "Identity & contact info" },
-                  { s: 2, label: "Financial details" },
-                  { s: 3, label: "Business declaration" },
-                  { s: 4, label: "Bank statement upload" }
-                ].map(({ s, label }) => (
+                  { s: 1, label: "Identity & contact info", detail: "PAN OCR extraction, full name, DOB & current address" },
+                  { s: 2, label: "Financial details", detail: "Annual income, CIBIL history, existing loans & credit use" },
+                  { s: 3, label: "Business declaration", detail: "Business vintage, ownership type & asset verification" },
+                  { s: 4, label: "Bank statement upload", detail: "Upload 6-month PDF bank statement for cashflow analysis" }
+                ].map(({ s, label, detail }) => (
                   <div key={s} className={`wirely-checklist-item ${step > s ? "wirely-checklist-item--completed" : ""}`}>
                     {step > s ? (
                       <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
@@ -1584,6 +1594,12 @@ export default function CreditAIApplyPage() {
                       <div className="w-[18px] h-[18px] rounded-full border-2 border-[#D9E2F2] shrink-0" />
                     )}
                     <span className={`text-[14px] ${step === s ? "font-semibold text-[#0F172A]" : step > s ? "text-[#94A3B8] line-through" : "text-[#64748B]"}`}>{label}</span>
+
+                    {/* Floating Tooltip Box on Hover */}
+                    <div className="wirely-floating-popover">
+                      <p className="font-semibold text-white mb-1">Step {s}: {label}</p>
+                      <p className="text-[11px] text-gray-300">{detail}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1611,19 +1627,42 @@ export default function CreditAIApplyPage() {
               </div>
             )}
 
-            {/* Tips Card */}
-            <div className="wirely-side-card wirely-side-card--tip flex gap-4">
-              <Lightbulb size={24} className="text-[#5B5FEF] shrink-0" style={{ color: "var(--wirely-accent)" }} />
-              <div>
-                <h4 className="wirely-card-title text-[18px] text-[#5B5FEF] mb-2" style={{ color: "var(--wirely-accent)" }}>Pro Tip</h4>
-                <p className="text-xs text-[#64748B] leading-relaxed">
-                  {sidebarInfo.tip}
-                </p>
+            {/* Tips Card with Hover Expansion */}
+            <div className="wirely-side-card wirely-side-card--tip flex flex-col gap-3">
+              <div className="flex gap-4 items-start">
+                <Lightbulb size={24} className="text-[#5B5FEF] shrink-0" style={{ color: "var(--wirely-accent)" }} />
+                <div>
+                  <h4 className="wirely-card-title text-[18px] text-[#5B5FEF] mb-1" style={{ color: "var(--wirely-accent)" }}>Pro Tip</h4>
+                  <p className="text-xs text-[#64748B] leading-relaxed">
+                    {sidebarInfo.tip}
+                  </p>
+                </div>
+              </div>
+              <div className="wirely-hover-expand-box text-xs text-gray-600 bg-white/60 p-3 rounded-xl border border-indigo-100">
+                <span className="font-semibold text-indigo-700 block mb-1">💡 Smart Verification Note</span>
+                Providing clear PAN images and un-passworded bank statements speeds up approval processing.
               </div>
             </div>
           </aside>
         </>
       )}
+
+      {/* Hidden File Inputs for Camera and Manual PAN Upload */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        style={{ display: "none" }}
+        onChange={onCameraChange}
+      />
+      <input
+        ref={panInputRef}
+        type="file"
+        accept="image/*,application/pdf"
+        style={{ display: "none" }}
+        onChange={onPanChange}
+      />
 
       {showCameraModal && (
         <div className="fixed inset-0 bg-black z-[10000] flex flex-col items-center justify-center overflow-hidden">
@@ -1668,5 +1707,4 @@ export default function CreditAIApplyPage() {
       )}
     </div>
   );
-
 }

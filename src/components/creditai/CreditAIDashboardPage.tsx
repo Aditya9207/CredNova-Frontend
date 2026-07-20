@@ -405,40 +405,21 @@ export default function CreditAIDashboardPage() {
 
       <div className={`wirely-main${isCollapsed ? " wirely-main--collapsed" : ""}`}>
         <header className="wirely-topbar">
-          <div className="wirely-hero">
-            <div className="wirely-breadcrumb">
-              <span className="text-[#6366f1] font-semibold">Dashboard</span> <span>&gt;</span> {crumb}
-            </div>
-            <h1 className="wirely-page-title">{sectionTitle}</h1>
-            <div className="wirely-hero__value">{credit_score.toLocaleString("en-IN")}</div>
-            <div className="wirely-hero__sub">Model credit score · band {risk_level}</div>
-            <div className="wirely-pill-row">
-              <div className="wirely-pill wirely-pill--active">
-                <span className="wirely-pill__muted">Form profile</span>
-                <span>CIBIL {cibilFormLabel}</span>
-              </div>
-              <div className="wirely-pill">
-                <span className="wirely-pill__dot" aria-hidden />
-                <span className="wirely-pill__muted">Statement</span>
-                <span>{kpiTxnRows ? `${kpiTxnRows} rows` : "—"}</span>
-                <span className="wirely-tag" style={{ marginLeft: 8 }}>
-                  Parsed
-                </span>
-              </div>
-            </div>
+          <div className="wirely-breadcrumb">
+            <span className="text-[#6366f1] font-semibold">Dashboard</span> <span>&gt;</span> {crumb}
           </div>
           <div className="wirely-topbar__right">
-            <div className="wirely-profile" style={{ padding: "6px 16px 6px 6px", borderRadius: "24px", background: "#ffffff", border: "1px solid rgba(180, 190, 210, 0.2)", gap: 16 }}>
+            <div className="wirely-profile" style={{ padding: "6px 16px 6px 6px", borderRadius: "24px", background: "#ffffff", border: "1px solid rgba(180, 190, 210, 0.2)", gap: 16, display: "flex", alignItems: "center" }}>
               <div style={{ position: "relative" }}>
                 <button 
                   type="button" 
                   className="wirely-profile__bell" 
                   aria-label="Notifications"
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  style={{ width: 34, height: 34, background: "transparent", borderColor: "rgba(180, 190, 210, 0.3)" }}
+                  style={{ width: 34, height: 34, background: "transparent", border: "1px solid rgba(180, 190, 210, 0.3)", borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
                   <Bell size={16} className="text-[#6b7a90]" />
-                  <span className="wirely-bell-badge" style={{ background: "#14b8a6", top: -2, right: -2, width: 8, height: 8 }} />
+                  <span className="wirely-bell-badge" style={{ background: "#14b8a6", position: "absolute", top: -2, right: -2, width: 8, height: 8, borderRadius: "50%" }} />
                 </button>
                 
                 {isNotificationsOpen && (
@@ -482,7 +463,33 @@ export default function CreditAIDashboardPage() {
                 Logout
               </button>
             </div>
-            <div className="wirely-kpi-row">
+          </div>
+        </header>
+
+        <div className="wirely-dashboard-body">
+          {/* Section Hero Banner */}
+          <div className="wirely-dashboard-hero">
+            <div className="wirely-dashboard-hero__left">
+              <h1 className="wirely-page-title" style={{ fontSize: 32, fontWeight: 700, margin: "0 0 8px 0", color: "#0F172A" }}>{sectionTitle}</h1>
+              <div className="wirely-hero__value">{credit_score.toLocaleString("en-IN")}</div>
+              <div className="wirely-hero__sub">Model credit score · band {risk_level}</div>
+              <div className="wirely-pill-row" style={{ marginTop: 16 }}>
+                <div className="wirely-pill wirely-pill--active">
+                  <span className="wirely-pill__muted">Form profile</span>
+                  <span>CIBIL {cibilFormLabel}</span>
+                </div>
+                <div className="wirely-pill">
+                  <span className="wirely-pill__dot" aria-hidden />
+                  <span className="wirely-pill__muted">Statement</span>
+                  <span>{kpiTxnRows ? `${kpiTxnRows} rows` : "—"}</span>
+                  <span className="wirely-tag" style={{ marginLeft: 8 }}>
+                    Parsed
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="wirely-kpi-row" style={{ marginTop: 0 }}>
               <div className="wirely-kpi">
                 <div className="wirely-kpi__label">Pending transfers</div>
                 <div className="wirely-kpi__value">{kpiPending}</div>
@@ -501,7 +508,6 @@ export default function CreditAIDashboardPage() {
               </div>
             </div>
           </div>
-        </header>
 
         {activeSection === "portfolio" ? (
           <>
@@ -684,6 +690,7 @@ export default function CreditAIDashboardPage() {
             </Suspense>
           </>
         ) : null}
+        </div>
       </div>
     </div>
   );

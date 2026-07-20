@@ -312,6 +312,7 @@
 }
 
 /* Fluid Scrolling Content Workspace */
+.wirely-main,
 .wirely-main-workspace {
   flex: 1;
   min-width: 0;
@@ -322,17 +323,19 @@
   flex-direction: column;
   position: relative;
   z-index: 10;
+  background: var(--wirely-bg-gradient);
 }
 
 /* Top Navigation Bar */
 .wirely-topbar {
-  height: 82px;
+  height: 72px;
+  min-height: 72px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 48px;
-  background: rgba(255, 255, 255, 0.72);
+  padding: 0 40px;
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid #EEF2F7;
@@ -360,18 +363,36 @@
   gap: 16px;
 }
 
-/* --- Hero value + pills --- */
+/* --- Hero Section & Dashboard Layout --- */
+.wirely-dashboard-hero {
+  padding: 36px 48px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  background: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid #EEF2F7;
+}
+
+.wirely-dashboard-body {
+  padding: 32px 48px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+}
+
 .wirely-hero {
-  margin-bottom: 20px;
-  padding-top: 56px;
-  /* Push down so 'My portfolio' aligns with the KPI row below the profile */
+  margin-bottom: 0;
+  padding-top: 0;
 }
 
 .wirely-hero__value {
-  font-size: 36px;
-  font-weight: 500;
-  color: var(--wirely-text);
-  letter-spacing: -0.02em;
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--wirely-text-primary);
+  letter-spacing: -0.03em;
+  margin-top: 4px;
 }
 
 .wirely-hero__sub {
@@ -2237,15 +2258,86 @@
   border-radius: 24px;
   border: 1px solid #EEF2F7;
   box-shadow: 0 15px 40px rgba(15, 23, 42, 0.05);
-  padding: 28px;
+  padding: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .wirely-side-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--wirely-shadow-hover);
+  border-color: rgba(91, 95, 239, 0.25);
+}
+
+/* Hover Expandable Detail Box */
+.wirely-hover-expand-box {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 0;
+  border-top: 1px solid transparent;
+}
+
+.wirely-side-card:hover .wirely-hover-expand-box,
+.wirely-hover-trigger:hover .wirely-hover-expand-box {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top-color: #EEF2F7;
+}
+
+.wirely-checklist-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.wirely-checklist-item:hover {
+  background: #F8FAFC;
+}
+
+/* Floating Tooltip / Popover Box on Hover */
+.wirely-floating-popover {
+  position: absolute;
+  right: 102%;
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+  width: 260px;
+  background: #0F172A;
+  color: #FFFFFF;
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+}
+
+.wirely-floating-popover::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #0F172A;
+}
+
+.wirely-checklist-item:hover .wirely-floating-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
 }
 
 .wirely-side-card__title {
