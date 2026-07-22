@@ -4,6 +4,7 @@ import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { CredNovaMark } from "./CredNovaMark";
 import "../styles/crednova-landing-axora.css";
+import MobileBottomNav from "./creditai/MobileBottomNav";
 
 const scrollToId = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -398,6 +399,7 @@ const LandingPage: FC = () => {
         </div>
         <span className="footer-copy">© {new Date().getFullYear()} CredNova · demo · Not a lender</span>
       </footer>
+      <MobileBottomNav />
     </div>
   );
 };

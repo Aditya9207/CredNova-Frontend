@@ -10,8 +10,8 @@ export default function WorkflowPipelineBanner() {
       style={{
         marginBottom: 24,
         padding: "18px 20px",
-        background: "linear-gradient(135deg, rgba(91, 135, 183, 0.12) 0%, rgba(76, 175, 160, 0.08) 100%)",
-        borderColor: "rgba(91, 135, 183, 0.35)",
+        background: "#ffffff",
+        borderColor: "#E7EAF2",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -63,9 +63,9 @@ export default function WorkflowPipelineBanner() {
             style={{
               padding: "12px 14px",
               borderRadius: 10,
-              background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
-              border: "1px solid rgba(148, 163, 184, 0.2)",
-              color: "#e2e8f0",
+              background: "linear-gradient(135deg, #F2F4FF 0%, #FAFBFF 100%)",
+              border: "1px solid #D9DFFF",
+              color: "#263658",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -83,9 +83,9 @@ export default function WorkflowPipelineBanner() {
             style={{
               padding: "12px 14px",
               borderRadius: 10,
-              background: "linear-gradient(180deg, #0c4a6e 0%, #0f172a 100%)",
-              border: "1px solid rgba(56, 189, 248, 0.25)",
-              color: "#e0f2fe",
+              background: "linear-gradient(135deg, #ECFBF8 0%, #FAFEFD 100%)",
+              border: "1px solid #BDEDE5",
+              color: "#1B4D49",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>

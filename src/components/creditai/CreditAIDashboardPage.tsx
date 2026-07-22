@@ -31,10 +31,47 @@ import ChartBlocksSkeleton from "./ChartBlocksSkeleton";
 import { WirelyArcGauge } from "./WirelyArcGauge";
 
 const MlScoringCharts = lazy(() => import("./MlScoringCharts"));
-const SpendingInsightsSection = lazy(() => import("./SpendingInsightsSection"));
 const AnalysisSpendingPanel = lazy(() => import("./AnalysisSpendingPanel"));
 import "@/styles/wirely.css";
+import "@/styles/ios-widgets.css";
 import { CredNovaMark } from "@/components/CredNovaMark";
+import MobileBottomNav from "./MobileBottomNav";
+
+type ActivityProps = { rows: number; change: string; avgFlow: string; pending: number };
+
+function AccountActivity({ rows, change, avgFlow, pending }: ActivityProps) {
+  return <section className="cred-rail-card">
+    <p className="cred-eyebrow">Account activity</p>
+    <dl className="cred-activity-list">
+      <div><dt>Total transactions</dt><dd>{rows.toLocaleString("en-IN")}</dd></div>
+      <div><dt>Monthly change</dt><dd className="is-positive">{change}</dd></div>
+      <div><dt>Avg flow / row</dt><dd>{avgFlow}</dd></div>
+      <div><dt>Pending transfers</dt><dd className={pending ? "" : "is-muted"}>{pending || "None"}</dd></div>
+    </dl>
+  </section>;
+}
+
+function CibilCta() {
+  return <section className="cred-cibil-cta">
+    <h2>Improve your score</h2>
+    <p>Link your CIBIL report to move from a modeled estimate to a verified score.</p>
+    <button type="button">Connect CIBIL →</button>
+  </section>;
+}
+
+function ScoreFactors({ cashRatio }: { cashRatio: number }) {
+  const factors = [
+    ["✧", "Consistent inflows", "steady monthly credits support a stable income signal."],
+    ["◉", "No CIBIL on file", "connect bureau data to strengthen the model score."],
+    ["⌁", "General-spend ratio", `${(cashRatio * 100).toFixed(1)}% is uncategorized; tag transactions for a sharper score.`],
+  ];
+  return <section className="cred-rail-card cred-factors">
+    <p className="cred-eyebrow">Score factors</p>
+    {factors.map(([icon, title, detail]) => <div className="cred-factor" key={title}>
+      <span>{icon}</span><p><strong>{title}</strong> — {detail}</p>
+    </div>)}
+  </section>;
+}
 
 function buildSuggestions(
   riskProb: number,
@@ -467,8 +504,13 @@ export default function CreditAIDashboardPage() {
         </header>
 
         <div className="wirely-dashboard-body">
-          {/* Section Hero Banner */}
-          <div className="wirely-dashboard-hero">
+          <div className="cred-dashboard-grid">
+          <main className="cred-dashboard-main">
+          <div className={`wirely-dashboard-hero cred-dashboard-hero${activeSection === "analysis" ? " cred-dashboard-hero--score" : ""}`}>
+            {activeSection === "analysis" ? <div className="cred-score-ring" aria-label={`Credit score ${credit_score}, band ${risk_level}`}>
+              <svg viewBox="0 0 120 120" aria-hidden><defs><linearGradient id="score-gradient" x1="0" x2="1"><stop stopColor="#C6862A"/><stop offset="1" stopColor="#D6544C"/></linearGradient></defs><circle cx="60" cy="60" r="48" className="cred-score-ring__track"/><circle cx="60" cy="60" r="48" className="cred-score-ring__value"/></svg>
+              <div><strong>{credit_score.toLocaleString("en-IN")}</strong><span>Band {risk_level}</span></div>
+            </div> : null}
             <div className="wirely-dashboard-hero__left">
               <h1 className="wirely-page-title" style={{ fontSize: 32, fontWeight: 700, margin: "0 0 8px 0", color: "#0F172A" }}>{sectionTitle}</h1>
               <div className="wirely-hero__value">{credit_score.toLocaleString("en-IN")}</div>
@@ -489,29 +531,11 @@ export default function CreditAIDashboardPage() {
               </div>
             </div>
 
-            <div className="wirely-kpi-row" style={{ marginTop: 0 }}>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Pending transfers</div>
-                <div className="wirely-kpi__value">{kpiPending}</div>
-              </div>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Total transactions</div>
-                <div className="wirely-kpi__value">{kpiTxnRows.toLocaleString("en-IN")}</div>
-              </div>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Monthly change</div>
-                <div className="wirely-kpi__value wirely-kpi__value--positive">{kpiMonthlyChange}</div>
-              </div>
-              <div className="wirely-kpi">
-                <div className="wirely-kpi__label">Avg flow / row</div>
-                <div className="wirely-kpi__value">{kpiAvgFlow}</div>
-              </div>
-            </div>
           </div>
 
         {activeSection === "portfolio" ? (
           <>
-            <div className="wirely-grid-2">
+            <div className="wirely-grid-2 cred-operations-card">
               <div className="wirely-card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <h2 className="wirely-card__title" style={{ marginBottom: 0 }}>
@@ -666,7 +690,7 @@ export default function CreditAIDashboardPage() {
                 }}
                 statementMetrics={data.statement_metrics}
               />
-              <SpendingInsightsSection insights={insights} loading={insightsLoading} error={insightsError} />
+              <AnalysisSpendingPanel insights={insights} loading={insightsLoading} error={insightsError} />
             </Suspense>
           </>
         ) : null}
@@ -690,8 +714,20 @@ export default function CreditAIDashboardPage() {
             </Suspense>
           </>
         ) : null}
+          </main>
+          <aside className="cred-dashboard-rail">
+            {activeSection === "analysis" ? <ScoreFactors cashRatio={Number(data.statement_metrics?.cash_transaction_ratio ?? 0)} /> : null}
+            {activeSection === "portfolio" ? <>
+              <section className="cred-rail-card cred-strength"><WirelyArcGauge percent={arcPercent} /><strong>{arcPercent}%</strong><p>Credit strength vs. maximum reference.</p>{trendInArc ? <small>{trendInArc}</small> : null}</section>
+              <section className="cred-rail-card cred-eligibility"><p className="cred-eyebrow">Quick operations</p><span>Illustrative eligibility</span><strong>₹{loanLimit}</strong><p>Based on your current model score and profile — not a final offer.</p></section>
+            </> : null}
+            <AccountActivity rows={kpiTxnRows} change={kpiMonthlyChange} avgFlow={kpiAvgFlow} pending={kpiPending} />
+            {activeSection !== "portfolio" ? <CibilCta /> : null}
+          </aside>
+          </div>
         </div>
       </div>
+      <MobileBottomNav activeSection={activeSection} onSelectSection={setActiveSection} />
     </div>
   );
 }

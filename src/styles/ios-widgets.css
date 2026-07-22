@@ -1,0 +1,519 @@
+/* ==========================================================================
+   CredNova Modern Mobile Dashboard — iOS-inspired design language
+   ========================================================================== */
+
+:root {
+  --cn-bg: #F5F6FA;
+  --cn-bg-elevated: #FFFFFF;
+  --cn-surface-glass: rgba(255, 255, 255, 0.72);
+  --cn-border: rgba(15, 23, 42, 0.06);
+  --cn-border-strong: rgba(15, 23, 42, 0.1);
+
+  --cn-accent: #5B5FEF;
+  --cn-accent-light: rgba(91, 95, 239, 0.1);
+  --cn-accent-gradient: linear-gradient(135deg, #4F6BFF 0%, #7A6EFF 100%);
+
+  --cn-success: #10B981;
+  --cn-success-light: rgba(16, 185, 129, 0.1);
+  --cn-warning: #F59E0B;
+  --cn-warning-light: rgba(245, 158, 11, 0.1);
+  --cn-danger: #EF4444;
+  --cn-danger-light: rgba(239, 68, 68, 0.1);
+
+  --cn-text-primary: #0F172A;
+  --cn-text-secondary: #64748B;
+  --cn-text-muted: #94A3B8;
+
+  --cn-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.03);
+  --cn-shadow-md: 0 4px 20px rgba(15, 23, 42, 0.06), 0 8px 32px rgba(15, 23, 42, 0.04);
+  --cn-shadow-lg: 0 12px 40px rgba(91, 95, 239, 0.12);
+
+  --cn-radius-sm: 14px;
+  --cn-radius-md: 20px;
+  --cn-radius-lg: 24px;
+  --cn-radius-xl: 28px;
+}
+
+/* ── Screen container ── */
+.cn-mobile-screen {
+  background: var(--cn-bg);
+  min-height: 100%;
+  padding: 20px 16px 32px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--cn-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.cn-mobile-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Header ── */
+.cn-mobile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.cn-mobile-greeting {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cn-text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.cn-mobile-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--cn-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-top: 2px;
+}
+
+.cn-mobile-fab {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--cn-accent-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--cn-shadow-lg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.cn-mobile-fab:active {
+  transform: scale(0.94);
+}
+
+/* ── Hero credit card ── */
+.cn-hero-card {
+  background: var(--cn-accent-gradient);
+  border-radius: var(--cn-radius-xl);
+  padding: 24px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--cn-shadow-lg);
+}
+
+.cn-hero-card::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.cn-hero-card::after {
+  content: "";
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 160px;
+  height: 160px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.cn-hero-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.75;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cn-hero-card__score {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 8px 0 4px;
+}
+
+.cn-hero-card__band {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cn-hero-card__band-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6EE7B7;
+}
+
+.cn-hero-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* ── Stat pills row ── */
+.cn-stat-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: none;
+}
+
+.cn-stat-row::-webkit-scrollbar {
+  display: none;
+}
+
+.cn-stat-chip {
+  flex: 1;
+  min-width: 100px;
+  background: var(--cn-bg-elevated);
+  border: 1px solid var(--cn-border);
+  border-radius: var(--cn-radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--cn-shadow-sm);
+}
+
+.cn-stat-chip__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cn-stat-chip__value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cn-text-primary);
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+}
+
+.cn-stat-chip__sub {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.cn-stat-chip__sub--green { color: var(--cn-success); }
+.cn-stat-chip__sub--red { color: var(--cn-danger); }
+
+/* ── Generic card ── */
+.cn-card {
+  background: var(--cn-bg-elevated);
+  border: 1px solid var(--cn-border);
+  border-radius: var(--cn-radius-lg);
+  padding: 20px;
+  box-shadow: var(--cn-shadow-sm);
+}
+
+.cn-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.cn-card__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cn-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cn-badge--live {
+  background: var(--cn-accent-light);
+  color: var(--cn-accent);
+}
+
+.cn-badge--active {
+  background: var(--cn-success-light);
+  color: var(--cn-success);
+}
+
+.cn-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Cashflow chart ── */
+.cn-cashflow-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--cn-text-primary);
+  margin-bottom: 16px;
+}
+
+.cn-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 80px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--cn-border);
+}
+
+.cn-bar-chart__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.cn-bar-chart__bar {
+  width: 100%;
+  border-radius: 6px 6px 2px 2px;
+  min-height: 4px;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cn-bar-chart__label {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--cn-text-muted);
+  margin-top: 6px;
+}
+
+.cn-legend-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cn-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--cn-text-secondary);
+}
+
+.cn-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.cn-legend-item strong {
+  margin-left: auto;
+  color: var(--cn-text-primary);
+  font-weight: 700;
+}
+
+/* ── Metric rows ── */
+.cn-metric-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cn-metric-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cn-border);
+}
+
+.cn-metric-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cn-metric-row:first-child {
+  padding-top: 0;
+}
+
+.cn-metric-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cn-metric-icon--green {
+  background: var(--cn-success-light);
+  color: var(--cn-success);
+}
+
+.cn-metric-icon--red {
+  background: var(--cn-danger-light);
+  color: var(--cn-danger);
+}
+
+.cn-metric-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cn-metric-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cn-text-primary);
+}
+
+.cn-metric-desc {
+  font-size: 11px;
+  color: var(--cn-text-muted);
+  margin-top: 1px;
+}
+
+.cn-metric-value {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cn-metric-value__main {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cn-text-primary);
+}
+
+.cn-metric-value__change {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.cn-metric-value__change--up { color: var(--cn-success); }
+.cn-metric-value__change--down { color: var(--cn-danger); }
+
+/* ── Insight card ── */
+.cn-insight-card {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: var(--cn-radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.cn-insight-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--cn-warning);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cn-insight-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cn-text-primary);
+  line-height: 1.3;
+}
+
+.cn-insight-card__body {
+  font-size: 12px;
+  color: var(--cn-text-secondary);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+/* ── Action buttons ── */
+.cn-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cn-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--cn-radius-md);
+  background: var(--cn-bg);
+  border: 1px solid var(--cn-border);
+  transition: background 0.15s ease, transform 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cn-action-btn:active {
+  transform: scale(0.97);
+  background: var(--cn-border);
+}
+
+.cn-action-btn__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.cn-action-btn__icon--primary {
+  background: var(--cn-accent-gradient);
+}
+
+.cn-action-btn__icon--green {
+  background: linear-gradient(135deg, #10B981, #059669);
+}
+
+.cn-action-btn__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cn-text-primary);
+}
+
+.cn-action-btn__sub {
+  font-size: 11px;
+  color: var(--cn-text-muted);
+  margin-top: 1px;
+}

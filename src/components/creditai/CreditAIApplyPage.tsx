@@ -40,6 +40,7 @@ import { runPanOcr } from "@/lib/panOcr";
 import "@/styles/wirely.css";
 import { CredNovaMark } from "@/components/CredNovaMark";
 import CredNovaMaterialLoader from "./CredNovaMaterialLoader";
+import MobileBottomNav from "./MobileBottomNav";
 
 const APPLY_PROCESS_MESSAGES = [
   "Securely uploading your statement…",
@@ -1705,6 +1706,7 @@ export default function CreditAIApplyPage() {
           </div>
         </div>
       )}
+      <MobileBottomNav />
     </div>
   );
 }

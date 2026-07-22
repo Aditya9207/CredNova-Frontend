@@ -944,5 +944,6 @@
     flex-direction: column;
     text-align: center;
     justify-content: center;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
