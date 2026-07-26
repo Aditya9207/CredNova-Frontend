@@ -31,6 +31,7 @@ export function WirelyArcGauge({ percent }: Props) {
         strokeWidth="10"
         strokeLinecap="round"
         strokeDasharray={`${dash} ${halfLen}`}
+        style={{ transition: "stroke-dasharray 1s cubic-bezier(0.4, 0, 0.2, 1)" }}
       />
     </svg>
   );

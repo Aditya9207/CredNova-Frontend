@@ -29,34 +29,41 @@ import StatementAnalysisSection from "./StatementAnalysisSection";
 import WorkflowPipelineBanner from "./WorkflowPipelineBanner";
 import ChartBlocksSkeleton from "./ChartBlocksSkeleton";
 import { WirelyArcGauge } from "./WirelyArcGauge";
+import MobileBottomNav from "./MobileBottomNav";
 
 const MlScoringCharts = lazy(() => import("./MlScoringCharts"));
 const AnalysisSpendingPanel = lazy(() => import("./AnalysisSpendingPanel"));
 import "@/styles/wirely.css";
 import "@/styles/ios-widgets.css";
 import { CredNovaMark } from "@/components/CredNovaMark";
-import MobileBottomNav from "./MobileBottomNav";
+
 
 type ActivityProps = { rows: number; change: string; avgFlow: string; pending: number };
 
 function AccountActivity({ rows, change, avgFlow, pending }: ActivityProps) {
-  return <section className="cred-rail-card">
-    <p className="cred-eyebrow">Account activity</p>
-    <dl className="cred-activity-list">
-      <div><dt>Total transactions</dt><dd>{rows.toLocaleString("en-IN")}</dd></div>
-      <div><dt>Monthly change</dt><dd className="is-positive">{change}</dd></div>
-      <div><dt>Avg flow / row</dt><dd>{avgFlow}</dd></div>
-      <div><dt>Pending transfers</dt><dd className={pending ? "" : "is-muted"}>{pending || "None"}</dd></div>
-    </dl>
-  </section>;
+  return (
+    <section className="cred-rail-card cn-stagger-3">
+      <div className="flex justify-between items-center mb-3">
+        <p className="cred-eyebrow" style={{ margin: 0 }}>Account activity</p>
+      </div>
+      <dl className="cred-activity-list">
+        <div><dt>Total transactions</dt><dd className="tabular-nums">{rows.toLocaleString("en-IN")}</dd></div>
+        <div><dt>Monthly change</dt><dd className="is-positive tabular-nums">{change}</dd></div>
+        <div><dt>Avg flow / row</dt><dd className="tabular-nums">{avgFlow}</dd></div>
+        <div><dt>Pending transfers</dt><dd className={pending ? "tabular-nums" : "is-muted"}>{pending || "None"}</dd></div>
+      </dl>
+    </section>
+  );
 }
 
 function CibilCta() {
-  return <section className="cred-cibil-cta">
-    <h2>Improve your score</h2>
-    <p>Link your CIBIL report to move from a modeled estimate to a verified score.</p>
-    <button type="button">Connect CIBIL →</button>
-  </section>;
+  return (
+    <section className="cred-cibil-cta cn-stagger-4">
+      <h2>Improve your score</h2>
+      <p>Link your CIBIL report to move from a modeled estimate to a verified score.</p>
+      <button type="button" className="cn-touch-target">Connect CIBIL →</button>
+    </section>
+  );
 }
 
 function ScoreFactors({ cashRatio }: { cashRatio: number }) {
@@ -65,12 +72,18 @@ function ScoreFactors({ cashRatio }: { cashRatio: number }) {
     ["◉", "No CIBIL on file", "connect bureau data to strengthen the model score."],
     ["⌁", "General-spend ratio", `${(cashRatio * 100).toFixed(1)}% is uncategorized; tag transactions for a sharper score.`],
   ];
-  return <section className="cred-rail-card cred-factors">
-    <p className="cred-eyebrow">Score factors</p>
-    {factors.map(([icon, title, detail]) => <div className="cred-factor" key={title}>
-      <span>{icon}</span><p><strong>{title}</strong> — {detail}</p>
-    </div>)}
-  </section>;
+  return (
+    <section className="cred-rail-card cred-factors cn-stagger-1">
+      <div className="flex justify-between items-center mb-3">
+        <p className="cred-eyebrow" style={{ margin: 0 }}>Score factors</p>
+      </div>
+      {factors.map(([icon, title, detail]) => (
+        <div className="cred-factor" key={title}>
+          <span>{icon}</span><p><strong>{title}</strong> — {detail}</p>
+        </div>
+      ))}
+    </section>
+  );
 }
 
 function buildSuggestions(
@@ -386,7 +399,7 @@ export default function CreditAIDashboardPage() {
         </nav>
         
         <div className="wirely-sidebar__profile-section" style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.05)", display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: 8, padding: "4px" }}>
             <UserButton 
               appearance={{ 
                 elements: { 
@@ -504,30 +517,46 @@ export default function CreditAIDashboardPage() {
         </header>
 
         <div className="wirely-dashboard-body">
-          <div className="cred-dashboard-grid">
+          <div className={`cred-dashboard-grid cred-dashboard-grid--${activeSection}`}>
           <main className="cred-dashboard-main">
           <div className={`wirely-dashboard-hero cred-dashboard-hero${activeSection === "analysis" ? " cred-dashboard-hero--score" : ""}`}>
             {activeSection === "analysis" ? <div className="cred-score-ring" aria-label={`Credit score ${credit_score}, band ${risk_level}`}>
               <svg viewBox="0 0 120 120" aria-hidden><defs><linearGradient id="score-gradient" x1="0" x2="1"><stop stopColor="#C6862A"/><stop offset="1" stopColor="#D6544C"/></linearGradient></defs><circle cx="60" cy="60" r="48" className="cred-score-ring__track"/><circle cx="60" cy="60" r="48" className="cred-score-ring__value"/></svg>
               <div><strong>{credit_score.toLocaleString("en-IN")}</strong><span>Band {risk_level}</span></div>
             </div> : null}
-            <div className="wirely-dashboard-hero__left">
-              <h1 className="wirely-page-title" style={{ fontSize: 32, fontWeight: 700, margin: "0 0 8px 0", color: "#0F172A" }}>{sectionTitle}</h1>
-              <div className="wirely-hero__value">{credit_score.toLocaleString("en-IN")}</div>
-              <div className="wirely-hero__sub">Model credit score · band {risk_level}</div>
-              <div className="wirely-pill-row" style={{ marginTop: 16 }}>
-                <div className="wirely-pill wirely-pill--active">
-                  <span className="wirely-pill__muted">Form profile</span>
-                  <span>CIBIL {cibilFormLabel}</span>
+            <div className="wirely-dashboard-hero__left w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className={`flex flex-wrap items-center gap-2 mb-1 ${activeSection === "analysis" ? "justify-center md:justify-start" : "justify-start"}`}>
+                  <h1 className="wirely-page-title" style={{ fontSize: 32, fontWeight: 700, margin: 0, color: "#0F172A" }}>{sectionTitle}</h1>
                 </div>
-                <div className="wirely-pill">
-                  <span className="wirely-pill__dot" aria-hidden />
-                  <span className="wirely-pill__muted">Statement</span>
-                  <span>{kpiTxnRows ? `${kpiTxnRows} rows` : "—"}</span>
-                  <span className="wirely-tag" style={{ marginLeft: 8 }}>
-                    Parsed
-                  </span>
+                <div className="wirely-hero__value tabular-nums">{credit_score.toLocaleString("en-IN")}</div>
+                <div className="wirely-hero__sub">Model credit score · band {risk_level}</div>
+                <div className={`wirely-pill-row ${activeSection === "analysis" ? "justify-center md:justify-start" : "justify-start"}`} style={{ marginTop: 16 }}>
+                  <div className="wirely-pill wirely-pill--active">
+                    <span className="wirely-pill__muted">Form profile</span>
+                    <span>CIBIL {cibilFormLabel}</span>
+                  </div>
+                  <div className="wirely-pill">
+                    <span className="wirely-pill__dot" aria-hidden />
+                    <span className="wirely-pill__muted">Statement</span>
+                    <span className="tabular-nums">{kpiTxnRows ? `${kpiTxnRows} rows` : "—"}</span>
+                    <span className="wirely-tag" style={{ marginLeft: 8 }}>
+                      Parsed
+                    </span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Above The Fold Primary CTA */}
+              <div className="shrink-0 pt-4 md:pt-0 w-full flex justify-center md:w-auto md:justify-end md:block">
+                <button
+                  type="button"
+                  onClick={() => navigate("/credit-ai")}
+                  className="wirely-btn px-5 py-3 text-sm font-semibold rounded-xl text-white bg-[#5B5FEF] hover:bg-[#4F6BFF] transition-all shadow-md flex items-center gap-2"
+                >
+                  <FileText size={18} />
+                  Start New Application
+                </button>
               </div>
             </div>
 
@@ -690,7 +719,6 @@ export default function CreditAIDashboardPage() {
                 }}
                 statementMetrics={data.statement_metrics}
               />
-              <AnalysisSpendingPanel insights={insights} loading={insightsLoading} error={insightsError} />
             </Suspense>
           </>
         ) : null}
@@ -716,17 +744,47 @@ export default function CreditAIDashboardPage() {
         ) : null}
           </main>
           <aside className="cred-dashboard-rail">
-            {activeSection === "analysis" ? <ScoreFactors cashRatio={Number(data.statement_metrics?.cash_transaction_ratio ?? 0)} /> : null}
+
             {activeSection === "portfolio" ? <>
               <section className="cred-rail-card cred-strength"><WirelyArcGauge percent={arcPercent} /><strong>{arcPercent}%</strong><p>Credit strength vs. maximum reference.</p>{trendInArc ? <small>{trendInArc}</small> : null}</section>
               <section className="cred-rail-card cred-eligibility"><p className="cred-eyebrow">Quick operations</p><span>Illustrative eligibility</span><strong>₹{loanLimit}</strong><p>Based on your current model score and profile — not a final offer.</p></section>
             </> : null}
             <AccountActivity rows={kpiTxnRows} change={kpiMonthlyChange} avgFlow={kpiAvgFlow} pending={kpiPending} />
             {activeSection !== "portfolio" ? <CibilCta /> : null}
+            {activeSection === "analysis" && data.statement_analysis?.insights?.length ? (
+              <div
+                className="wirely-card"
+                style={{ padding: 20, background: "rgba(91,135,183,0.08)", borderColor: "rgba(180,190,210,0.45)" }}
+              >
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", color: "#5b87b7", margin: "0 0 12px" }}>
+                  SCORE FACTORS
+                </h3>
+                <ul style={{ margin: 0, paddingLeft: 18, color: "#1a2236", fontSize: 14, lineHeight: 1.55 }}>
+                  <li>
+                    <strong>ML model:</strong> risk band <strong>{risk_level}</strong> (
+                    {typeof risk_probability === "number" && !isNaN(risk_probability)
+                      ? `${(risk_probability * 100).toFixed(1)}%`
+                      : "—"}{" "}
+                    estimated risk probability).
+                  </li>
+                  {data.statement_analysis.insights.map((t, i) => (
+                    <li key={i}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {activeSection === "insights" ? (
+              <div className="cred-rail-spending-panel">
+                <Suspense fallback={<ChartBlocksSkeleton />}>
+                  <AnalysisSpendingPanel insights={insights} loading={insightsLoading} error={insightsError} />
+                </Suspense>
+              </div>
+            ) : null}
           </aside>
           </div>
         </div>
       </div>
+
       <MobileBottomNav activeSection={activeSection} onSelectSection={setActiveSection} />
     </div>
   );

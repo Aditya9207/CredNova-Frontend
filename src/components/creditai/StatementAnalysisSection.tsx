@@ -56,10 +56,12 @@ export default function StatementAnalysisSection({
 
   if (!analysis?.available || !analysis.monthly?.length) {
     return (
-      <div className="wirely-card" style={{ marginBottom: 24 }}>
-        <h2 className="wirely-card__title" style={{ marginBottom: 8 }}>
-          Statement analysis
-        </h2>
+      <div className="wirely-card border-slate-200" style={{ marginBottom: 24 }}>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="wirely-card__title" style={{ margin: 0 }}>
+            Statement analysis
+          </h2>
+        </div>
         <p style={{ color: "var(--wirely-text-muted)", fontSize: 14, margin: 0, lineHeight: 1.55 }}>
           {statementRowCount > 0
             ? "We parsed rows from your PDF, but the monthly cashflow timeline could not be built. Try re-exporting from net banking with a standard date column."
@@ -126,7 +128,9 @@ export default function StatementAnalysisSection({
   return (
     <div style={{ marginBottom: 28 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-        <h2 className="wirely-card__title" style={{ margin: 0 }}>Statement analysis</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="wirely-card__title" style={{ margin: 0 }}>Statement analysis</h2>
+        </div>
         <span className="wirely-kpi__label">From uploaded bank PDF</span>
       </div>
 
@@ -323,27 +327,6 @@ export default function StatementAnalysisSection({
         })}
       </div>
 
-      {/* Score factors */}
-      <div
-        className="wirely-card"
-        style={{ marginTop: 18, padding: 20, background: "rgba(91,135,183,0.08)", borderColor: "rgba(180,190,210,0.45)" }}
-      >
-        <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", color: "#5b87b7", margin: "0 0 12px" }}>
-          SCORE FACTORS
-        </h3>
-        <ul style={{ margin: 0, paddingLeft: 18, color: "#1a2236", fontSize: 14, lineHeight: 1.55 }}>
-          <li>
-            <strong>ML model:</strong> risk band <strong>{riskLevel}</strong> (
-            {typeof riskProbability === "number" && !isNaN(riskProbability)
-              ? `${(riskProbability * 100).toFixed(1)}%`
-              : "—"}{" "}
-            estimated risk probability).
-          </li>
-          {insights.map((t, i) => (
-            <li key={i}>{t}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

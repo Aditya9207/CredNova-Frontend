@@ -83,8 +83,16 @@
   color: #0a0a0a;
 }
 .cn-axora .btn-signup {
-  font-weight: 500;
-  color: #0a0a0a;
+  font-weight: 600;
+  color: #ffffff !important;
+  background: #0a0a0a !important;
+  padding: 8px 20px !important;
+  border-radius: 9999px;
+  transition: all 0.2s ease !important;
+}
+.cn-axora .btn-signup:hover {
+  background: #262626 !important;
+  transform: translateY(-1px);
 }
 
 /* Hero */

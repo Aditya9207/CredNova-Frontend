@@ -42,6 +42,7 @@ import { CredNovaMark } from "@/components/CredNovaMark";
 import CredNovaMaterialLoader from "./CredNovaMaterialLoader";
 import MobileBottomNav from "./MobileBottomNav";
 
+
 const APPLY_PROCESS_MESSAGES = [
   "Securely uploading your statement…",
   "Extracting transactions from the PDF…",
@@ -95,6 +96,14 @@ export default function CreditAIApplyPage() {
 
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const scrollContainers = document.querySelectorAll(".wirely-main, .wirely-main-workspace");
+    scrollContainers.forEach((container) => {
+      container.scrollTop = 0;
+    });
+  }, [step]);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfPassword, setPdfPassword] = useState("");
   const [ocrLoading, setOcrLoading] = useState(false);
@@ -1332,8 +1341,8 @@ export default function CreditAIApplyPage() {
               </div>
             </div>
 
-            {/* 5. Sticky Bottom Navigation */}
-            <div className="wirely-mobile-sticky-nav">
+            {/* 5. Inline End Navigation */}
+            <div className="wirely-mobile-actions">
               {step > 1 ? (
                 <button 
                   type="button" 
@@ -1606,27 +1615,7 @@ export default function CreditAIApplyPage() {
               </div>
             </div>
 
-            {/* Next Step Card */}
-            {step < 4 && (
-              <div className="wirely-side-card animate-fade-in" style={{ background: "linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)" }}>
-                <span className="wirely-label" style={{ color: "var(--wirely-accent)" }}>UPCOMING SECTION</span>
-                <h4 className="text-lg font-bold text-[#0F172A] mt-2 mb-1">
-                  {step === 1 ? "Financial details" : step === 2 ? "Business declaration" : "Bank statement upload"}
-                </h4>
-                <p className="text-xs text-[#94A3B8] mb-4">Est. time: ~2 mins</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (validateCurrentStep()) {
-                      setStep(step + 1);
-                    }
-                  }}
-                  className="wirely-btn w-full justify-center"
-                >
-                  Continue <ArrowRight size={16} />
-                </button>
-              </div>
-            )}
+
 
             {/* Tips Card with Hover Expansion */}
             <div className="wirely-side-card wirely-side-card--tip flex flex-col gap-3">
@@ -1706,6 +1695,7 @@ export default function CreditAIApplyPage() {
           </div>
         </div>
       )}
+
       <MobileBottomNav />
     </div>
   );
