@@ -32,6 +32,7 @@ import {
   LogOut,
   RotateCw,
   Contact,
+  Sparkles,
 } from "lucide-react";
 
 import { submitCreditApplicationMultipart } from "@/lib/creditApi";
@@ -1024,6 +1025,14 @@ export default function CreditAIApplyPage() {
 
   const renderStep4 = () => (
     <div className="space-y-8 animate-fade-in">
+      {/* Document processing feature status notice */}
+      <div className="flex items-start gap-3 p-3.5 mb-5 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-950 text-xs sm:text-sm shadow-sm">
+        <Sparkles size={18} className="text-amber-700 shrink-0 mt-0.5" />
+        <div className="leading-relaxed">
+          <strong className="text-amber-900">Feature Status:</strong> Real-time automated document processing &amp; OCR statement parsing are undergoing upgrades and will be fully live soon. You can attach your PDF or proceed with simulated assessment models.
+        </div>
+      </div>
+
       <div
         role="button"
         tabIndex={0}

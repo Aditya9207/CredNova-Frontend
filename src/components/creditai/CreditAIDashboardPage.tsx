@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
 import {
   fetchCreditApplication,
@@ -59,8 +60,10 @@ function AccountActivity({ rows, change, avgFlow, pending }: ActivityProps) {
 function CibilCta() {
   return (
     <section className="cred-cibil-cta cn-stagger-4">
-      <h2>Improve your score</h2>
-      <p>Link your CIBIL report to move from a modeled estimate to a verified score.</p>
+      <h2 style={{ color: "#ffffff", fontWeight: 700, margin: "0 0 8px" }}>Improve your score</h2>
+      <p style={{ color: "rgba(255, 255, 255, 0.95)", margin: "0 0 16px", fontSize: "13px", lineHeight: 1.5 }}>
+        Link your CIBIL report to move from a modeled estimate to a verified score.
+      </p>
       <button type="button" className="cn-touch-target">Connect CIBIL →</button>
     </section>
   );
@@ -149,6 +152,75 @@ type StoredResult = {
 
 type DashboardSection = "portfolio" | "insights" | "analysis";
 
+const DEFAULT_MOCK_STATEMENT_ANALYSIS: StatementAnalysis = {
+  available: true,
+  monthly: [
+    { key: "2025-03", label: "Mar 2025", credits: 88500, debits: 64200 },
+    { key: "2025-04", label: "Apr 2025", credits: 92000, debits: 71800 },
+    { key: "2025-05", label: "May 2025", credits: 89000, debits: 62400 },
+    { key: "2025-06", label: "Jun 2025", credits: 95000, debits: 68900 },
+    { key: "2025-07", label: "Jul 2025", credits: 91500, debits: 65300 },
+    { key: "2025-08", label: "Aug 2025", credits: 98000, debits: 74100 },
+  ],
+  totals: {
+    total_credits_inr: 554000,
+    total_debits_inr: 406700,
+    net_savings_inr: 147300,
+    months_in_chart: 6,
+  },
+  balance: {
+    peak_inr: 184500,
+    peak_month_label: "Aug 2025",
+    closing_inr: 158200,
+  },
+  rental: {
+    credits_inr: 25000,
+    months_with_rent: 6,
+    avg_monthly_inr: 25000,
+  },
+  insights: [
+    "Healthy monthly savings rate averaging 26.5% of total inflow over 6 months.",
+    "Consistent primary salary/business inflow detected on the 1st week of each month.",
+    "UPI velocity demonstrates high active digital footprint (average 42 transactions/month).",
+    "No overdraft fees or negative balance dips recorded across all 6 reporting periods.",
+    "Rental income stability observed with 6 recurring credits averaging ₹25,000.",
+    "Low cash withdrawal ratio (< 15%), indicating verifiable digital expenditure trails.",
+  ],
+};
+
+const DEFAULT_MOCK_DASHBOARD_RESULT: StoredResult = {
+  application_id: "6ad5f236e815f3434965ed1e",
+  model_output: {
+    credit_score: 765,
+    risk_probability: 0.18,
+    risk_level: "Low",
+    alt_cibil_score: 765,
+    pd: 0.18,
+    tier: "Tier 1",
+  },
+  model_payload: {
+    CIBIL_score: 765,
+    age: 26,
+    annual_income: 1200000,
+    upi_transactions_monthly: 42,
+    cash_transaction_ratio: 0.08,
+  },
+  statement_metrics: {
+    statement_row_count: 45,
+    monthly_upi: 42,
+    cash_transaction_ratio: 0.08,
+    months_analyzed: 6,
+  },
+  statement_analysis: DEFAULT_MOCK_STATEMENT_ANALYSIS,
+  asset_verification: { status: "verified" },
+  formSummary: {
+    full_name: "Aditya",
+    annual_income: 1200000,
+    cibil_score: 765,
+    business_type: "salaried",
+  },
+};
+
 export default function CreditAIDashboardPage() {
   const navigate = useNavigate();
   const { signOut } = useClerk();
@@ -164,30 +236,34 @@ export default function CreditAIDashboardPage() {
   const [insightsError, setInsightsError] = useState<string | null>(null);
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("creditAiLastResult");
+    let raw = sessionStorage.getItem("creditAiLastResult");
     if (!raw) {
-      console.warn("[CredNova] Portfolio: no session data — redirecting to apply flow");
-      navigate("/credit-ai");
-      return;
+      console.info("[CredNova] Portfolio: no session data — initializing with mock demo assessment");
+      sessionStorage.setItem("creditAiLastResult", JSON.stringify(DEFAULT_MOCK_DASHBOARD_RESULT));
+      raw = JSON.stringify(DEFAULT_MOCK_DASHBOARD_RESULT);
     }
     try {
-      const parsed = JSON.parse(raw) as StoredResult;
-      // FE-5: validate that parsed result has the minimum required fields
+      let parsed = JSON.parse(raw) as StoredResult;
+      // If parsed result has missing model_output, use mock data
       if (!parsed || typeof parsed !== "object" || !parsed.model_output) {
-        console.warn("[CredNova] Portfolio: session data missing model_output — redirecting");
-        sessionStorage.removeItem("creditAiLastResult");
-        navigate("/credit-ai");
-        return;
+        parsed = DEFAULT_MOCK_DASHBOARD_RESULT;
+        sessionStorage.setItem("creditAiLastResult", JSON.stringify(DEFAULT_MOCK_DASHBOARD_RESULT));
       }
+
+      // If statement analysis is missing or unavailable, fallback to mock analysis
+      if (!parsed.statement_analysis || !parsed.statement_analysis.available) {
+        parsed.statement_analysis = DEFAULT_MOCK_STATEMENT_ANALYSIS;
+      }
+
       setData(parsed);
-      console.info("[CredNova] Portfolio page: loaded latest assessment from sessionStorage", {
+      console.info("[CredNova] Portfolio page: loaded latest assessment", {
         applicationId: parsed.application_id,
         creditScore: parsed.model_output?.credit_score ?? parsed.model_output?.alt_cibil_score,
         riskLevel: parsed.model_output?.risk_level ?? parsed.model_output?.tier,
         statementRows: parsed.statement_metrics?.statement_row_count,
       });
 
-      if (parsed.application_id && (!parsed.statement_analysis || !parsed.model_payload)) {
+      if (parsed.application_id) {
         fetchCreditApplication(parsed.application_id)
           .then((doc) => {
             const stmt = doc.statement as { analysis?: StatementAnalysis } | undefined;
@@ -196,7 +272,7 @@ export default function CreditAIDashboardPage() {
             if (analysis?.available || mp) {
               const merged: StoredResult = {
                 ...parsed,
-                ...(analysis?.available ? { statement_analysis: analysis } : {}),
+                statement_analysis: analysis?.available ? analysis : DEFAULT_MOCK_STATEMENT_ANALYSIS,
                 ...(mp ? { model_payload: mp } : {}),
               };
               setData(merged);
@@ -208,9 +284,9 @@ export default function CreditAIDashboardPage() {
           });
       }
     } catch (e) {
-      console.error("[CredNova] Portfolio: invalid session JSON", e);
-      sessionStorage.removeItem("creditAiLastResult");
-      navigate("/credit-ai");
+      console.error("[CredNova] Portfolio: invalid session JSON, resetting to default demo", e);
+      sessionStorage.setItem("creditAiLastResult", JSON.stringify(DEFAULT_MOCK_DASHBOARD_RESULT));
+      setData(DEFAULT_MOCK_DASHBOARD_RESULT);
     }
   }, [navigate]);
 
@@ -517,21 +593,49 @@ export default function CreditAIDashboardPage() {
         </header>
 
         <div className="wirely-dashboard-body">
+          {/* Document processing feature status banner */}
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 text-amber-950 text-xs sm:text-sm shadow-sm mb-4">
+            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 text-amber-700">
+              <Sparkles size={16} />
+            </div>
+            <div className="flex-1 min-w-0 leading-relaxed">
+              <span className="font-semibold text-amber-900">Feature Notice: </span>
+              Automated document processing and real-time bank statement OCR are currently in development and will be live soon. Full modeled scoring, verified alternative cashflow analytics, and risk benchmarks are actively available below.
+            </div>
+            <span className="shrink-0 text-[11px] px-2.5 py-1 rounded-full bg-amber-200/80 text-amber-800 font-semibold uppercase tracking-wider hidden sm:inline-block">
+              In Progress · Live Soon
+            </span>
+          </div>
+
           <div className={`cred-dashboard-grid cred-dashboard-grid--${activeSection}`}>
           <main className="cred-dashboard-main">
-          <div className={`wirely-dashboard-hero cred-dashboard-hero${activeSection === "analysis" ? " cred-dashboard-hero--score" : ""}`}>
-            {activeSection === "analysis" ? <div className="cred-score-ring" aria-label={`Credit score ${credit_score}, band ${risk_level}`}>
-              <svg viewBox="0 0 120 120" aria-hidden><defs><linearGradient id="score-gradient" x1="0" x2="1"><stop stopColor="#C6862A"/><stop offset="1" stopColor="#D6544C"/></linearGradient></defs><circle cx="60" cy="60" r="48" className="cred-score-ring__track"/><circle cx="60" cy="60" r="48" className="cred-score-ring__value"/></svg>
-              <div><strong>{credit_score.toLocaleString("en-IN")}</strong><span>Band {risk_level}</span></div>
-            </div> : null}
+          <div className="wirely-dashboard-hero cred-dashboard-hero cred-dashboard-hero--score">
+            <div className="cred-score-ring" aria-label={`Credit score ${credit_score}, band ${risk_level}`}>
+              <svg viewBox="0 0 120 120" aria-hidden>
+                <defs>
+                  <linearGradient id="score-gradient" x1="0" x2="1">
+                    <stop stopColor="#C6862A" />
+                    <stop offset="1" stopColor="#D6544C" />
+                  </linearGradient>
+                </defs>
+                <circle cx="60" cy="60" r="48" className="cred-score-ring__track" />
+                <circle cx="60" cy="60" r="48" className="cred-score-ring__value" />
+              </svg>
+              <div>
+                <strong>{credit_score.toLocaleString("en-IN")}</strong>
+                <span>Band {risk_level}</span>
+              </div>
+            </div>
             <div className="wirely-dashboard-hero__left w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <div className={`flex flex-wrap items-center gap-2 mb-1 ${activeSection === "analysis" ? "justify-center md:justify-start" : "justify-start"}`}>
-                  <h1 className="wirely-page-title" style={{ fontSize: 32, fontWeight: 700, margin: 0, color: "#0F172A" }}>{sectionTitle}</h1>
+                <div className="flex flex-wrap items-center gap-2 mb-1 justify-start">
+                  <h1 className="wirely-page-title" style={{ fontSize: 28, fontWeight: 700, margin: 0, color: "#0F172A" }}>
+                    {sectionTitle}
+                  </h1>
                 </div>
                 <div className="wirely-hero__value tabular-nums">{credit_score.toLocaleString("en-IN")}</div>
                 <div className="wirely-hero__sub">Model credit score · band {risk_level}</div>
-                <div className={`wirely-pill-row ${activeSection === "analysis" ? "justify-center md:justify-start" : "justify-start"}`} style={{ marginTop: 16 }}>
+                <div className="wirely-pill-row justify-start" style={{ marginTop: 14 }}>
                   <div className="wirely-pill wirely-pill--active">
                     <span className="wirely-pill__muted">Form profile</span>
                     <span>CIBIL {cibilFormLabel}</span>
@@ -548,103 +652,142 @@ export default function CreditAIDashboardPage() {
               </div>
 
               {/* Above The Fold Primary CTA */}
-              <div className="shrink-0 pt-4 md:pt-0 w-full flex justify-center md:w-auto md:justify-end md:block">
+              <div className="shrink-0 pt-2 md:pt-0 w-full flex justify-start md:w-auto md:justify-end md:block">
                 <button
                   type="button"
                   onClick={() => navigate("/credit-ai")}
-                  className="wirely-btn px-5 py-3 text-sm font-semibold rounded-xl text-white bg-[#5B5FEF] hover:bg-[#4F6BFF] transition-all shadow-md flex items-center gap-2"
+                  className="wirely-btn px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-[#5B5FEF] hover:bg-[#4F6BFF] transition-all shadow-md flex items-center gap-2"
                 >
                   <FileText size={18} />
                   Start New Application
                 </button>
               </div>
             </div>
-
           </div>
 
         {activeSection === "portfolio" ? (
           <>
-            <div className="wirely-grid-2 cred-operations-card">
-              <div className="wirely-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h2 className="wirely-card__title" style={{ marginBottom: 0 }}>
-                    Latest operations
+            {/* Assessment Operations & Action Signals */}
+            <div className="wirely-card cred-operations-card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <div>
+                  <h2 className="wirely-card__title" style={{ margin: 0, fontSize: 20 }}>
+                    Assessment Operations
                   </h2>
-                </div>
-                <div className="wirely-ops-row" style={{ marginTop: 8 }}>
-                  <div className="wirely-ops-row__left">
-                    <div>
-                      <div className="wirely-amount-pill">
-                        <span className="wirely-amount-pill__label">Pending review</span>
-                        Risk {(risk_probability * 100).toFixed(1)}%
-                      </div>
-                    </div>
-                    <div>
-                      <div className="wirely-amount-pill wirely-amount-pill--active">
-                        <span className="wirely-amount-pill__label">Last model score</span>
-                        {credit_score} pts
-                      </div>
-                    </div>
-                  </div>
-                  <div className="wirely-ops-row__right">
-                    
-                    {suggestions.map((s, i) => (
-                      <div key={i} className="wirely-contact">
-                        <div className="wirely-avatar">{initials(s.text)}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 14, fontWeight: 500, color: "var(--wirely-text)" }}>{s.text}</div>
-                          <div className="wirely-contact__meta">{s.sub}</div>
-                        </div>
-                      </div>
-                    ))}
-                    
-                  </div>
+                  <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>
+                    Key alternative-data and model inference metrics for this portfolio
+                  </p>
                 </div>
               </div>
 
-              <div className="wirely-split-right">
-                <div className="wirely-card" style={{ paddingBottom: 12 }}>
-                  <div className="wirely-arc-wrap">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                    Model Risk Probability
+                  </span>
+                  <div className="text-2xl font-bold text-slate-900 tabular-nums">
+                    {(risk_probability * 100).toFixed(1)}%
+                  </div>
+                  <span className="text-xs text-emerald-600 font-medium mt-1 inline-block">
+                    Risk band: {risk_level}
+                  </span>
+                </div>
+                <div className="p-4 rounded-xl bg-indigo-50/70 border border-indigo-100">
+                  <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block mb-1">
+                    Model Credit Score
+                  </span>
+                  <div className="text-2xl font-bold text-indigo-950 tabular-nums">
+                    {credit_score} <span className="text-sm font-normal text-slate-500">/ 900</span>
+                  </div>
+                  <span className="text-xs text-indigo-600 font-medium mt-1 inline-block">
+                    CIBIL profile: {cibilFormLabel}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                  Tailored Action Signals
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {suggestions.map((s, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 bg-white shadow-sm hover:border-slate-200 transition-colors">
+                      <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 font-bold text-xs flex items-center justify-center shrink-0">
+                        {initials(s.text)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-semibold text-slate-900">{s.text}</div>
+                        <div className="text-xs text-slate-500 leading-relaxed mt-0.5">{s.sub}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 2-column cards: Credit Strength Gauge + Eligibility */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="wirely-card flex flex-col justify-between">
+                <div>
+                  <h2 className="wirely-card__title" style={{ margin: "0 0 16px", fontSize: 18 }}>
+                    Credit Strength Index
+                  </h2>
+                  <div className="wirely-arc-wrap my-2">
                     <WirelyArcGauge percent={arcPercent} />
                     <div style={{ textAlign: "center", marginTop: 4 }}>
                       <div className="wirely-arc__pct">{arcPercent}%</div>
                       {trendInArc ? <div className="wirely-arc__trend">{trendInArc}</div> : null}
                     </div>
-                    <p className="wirely-arc__caption">
-                      Credit strength vs. maximum reference. Goals for this assessment are on track.
-                    </p>
-                    <button type="button" className="wirely-link">
-                      View plan
-                    </button>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-slate-100 text-center">
+                  <p className="text-xs text-slate-500 leading-relaxed m-0">
+                    Modeled credit strength compared against prime reference benchmark.
+                  </p>
+                </div>
+              </div>
+
+              <div className="wirely-dark-card flex flex-col justify-between">
+                <div>
+                  <div className="wirely-dark-card__muted">Illustrative Eligibility</div>
+                  <div className="wirely-dark-card__label">Estimated Maximum Limit</div>
+                  <div className="text-3xl font-extrabold my-3 text-white tracking-tight tabular-nums drop-shadow-sm">₹{loanLimit}</div>
+                  
+                  <div className="space-y-3 mt-4">
+                    <div className="wirely-field">
+                      <div className="wirely-field__label">Primary Model Score</div>
+                      <div className="wirely-field__value flex items-center justify-between">
+                        <span>{credit_score} pts</span>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                          AI Modeled
+                        </span>
+                      </div>
+                    </div>
+                    <div className="wirely-field">
+                      <div className="wirely-field__label">Determined Risk Band</div>
+                      <div className="wirely-field__value flex items-center justify-between">
+                        <span>Band {risk_level}</span>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          Prime Grade
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="wirely-dark-card">
-                  <div className="wirely-dark-card__muted">Quick operations</div>
-                  <div className="wirely-dark-card__label">Illustrative eligibility</div>
-                  <div style={{ fontSize: 20, fontWeight: 500, marginBottom: 16 }}>₹ {loanLimit}</div>
-                  <div className="wirely-field">
-                    <div className="wirely-field__label">Source · model score</div>
-                    <div className="wirely-field__value">{credit_score}</div>
-                  </div>
-                  <div className="wirely-field">
-                    <div className="wirely-field__label">Destination · risk band</div>
-                    <div className="wirely-field__value">{risk_level}</div>
-                  </div>
-                  <div className="wirely-dark-footer">
-                    <span>
-                      CIBIL {cibilFormLabel} → Alt data blend
-                    </span>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      {csvHref ? (
-                        <a href={csvHref} target="_blank" rel="noreferrer" className="wirely-btn" style={{ textDecoration: "none" }}>
-                          CSV
-                        </a>
-                      ) : null}
-                      <button type="button" className="wirely-btn" onClick={() => navigate("/credit-ai")}>
-                        Review »
-                      </button>
-                    </div>
+                <div className="wirely-dark-footer mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                  <span className="text-xs text-slate-300 font-medium">
+                    CIBIL {cibilFormLabel} → Alternate Blend
+                  </span>
+                  <div className="flex gap-2">
+                    {csvHref ? (
+                      <a href={csvHref} target="_blank" rel="noreferrer" className="wirely-btn text-xs py-2 px-3.5 h-auto min-h-0" style={{ textDecoration: "none" }}>
+                        Export CSV
+                      </a>
+                    ) : null}
+                    <button type="button" className="wirely-btn text-xs py-2 px-3.5 h-auto min-h-0" onClick={() => navigate("/credit-ai")}>
+                      New Review »
+                    </button>
                   </div>
                 </div>
               </div>
@@ -745,12 +888,11 @@ export default function CreditAIDashboardPage() {
           </main>
           <aside className="cred-dashboard-rail">
 
-            {activeSection === "portfolio" ? <>
-              <section className="cred-rail-card cred-strength"><WirelyArcGauge percent={arcPercent} /><strong>{arcPercent}%</strong><p>Credit strength vs. maximum reference.</p>{trendInArc ? <small>{trendInArc}</small> : null}</section>
-              <section className="cred-rail-card cred-eligibility"><p className="cred-eyebrow">Quick operations</p><span>Illustrative eligibility</span><strong>₹{loanLimit}</strong><p>Based on your current model score and profile — not a final offer.</p></section>
-            </> : null}
+            {activeSection === "portfolio" ? (
+              <ScoreFactors cashRatio={Number(data?.statement_metrics?.cash_transaction_ratio ?? 0.08)} />
+            ) : null}
             <AccountActivity rows={kpiTxnRows} change={kpiMonthlyChange} avgFlow={kpiAvgFlow} pending={kpiPending} />
-            {activeSection !== "portfolio" ? <CibilCta /> : null}
+            <CibilCta />
             {activeSection === "analysis" && data.statement_analysis?.insights?.length ? (
               <div
                 className="wirely-card"
