@@ -2,8 +2,9 @@
  * Credit pipeline API (FastAPI /credit routes).
  * Set VITE_API_URL in .env (e.g. http://127.0.0.1:8000).
  */
+import { API_BASE } from './apiBase';
 
-const BASE = import.meta.env.VITE_API_URL || 'https://crednova-backend.onrender.com';
+const BASE = API_BASE;
 
 /** Avoid hung UI when API or upstream ML never responds (browser fetch has no default timeout). */
 function withTimeoutMs(ms: number): AbortSignal | undefined {
